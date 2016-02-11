@@ -1,0 +1,36 @@
+(ns reactive-console.replumb-proxy
+  (:require [replumb.core :as replumb]
+            [replumb.repl :as replumb-repl]
+            [reactive-console.io :as io]))
+
+(defn repl-options
+  "Options for replumb.core/read-eval-call.
+
+  Read the docs at https://github.com/ScalaConsultants/replumb"
+  [verbose? src-paths]
+  (merge (replumb/browser-options src-paths io/fetch-file!)
+         {:warning-as-error true
+          :verbose verbose?}))
+
+(defn read-eval-call [opts cb source]
+  (let [ns (replumb-repl/current-ns)]
+    (replumb/read-eval-call opts
+                            #(cb {:success? (replumb/success? %)
+                                  :result   (replumb/unwrap-result %)
+                                  :prev-ns  ns
+                                  :source   source})
+                            source)))
+
+(defn multiline?
+  [input]
+  (try
+    (replumb-repl/repl-read-string input)
+    false
+    (catch :default _
+      true)))
+
+(def eval-opts {:get-prompt  replumb/get-prompt
+                :should-eval (complement multiline?)
+                :evaluate    (partial read-eval-call
+                                      (repl-options false
+                                                    (:src-paths ["/js/compiled/out"])))})

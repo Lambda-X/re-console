@@ -38,5 +38,9 @@
  (fn [db [_ console-key]]
    (reaction (not (empty? (app/queued-forms @db console-key))))))
 
+(register-sub
+ :get-console-eval-opts
+ (fn [db [_ console-key]]
+   (reaction (app/console-eval-opts @db console-key))))
 
 ;; )

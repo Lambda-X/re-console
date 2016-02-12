@@ -1,6 +1,6 @@
 (ns reactive-console.core
   (:require [reagent.core :as reagent :refer [atom]]
-            [re-frame.core :refer [subscribe dispatch]]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [reactive-console.handlers :as handlers]
             [reactive-console.subs :as subs]
             [reactive-console.editor :as editor]
@@ -10,22 +10,13 @@
 ;;; many parts are taken from jaredly's reepl
 ;;; https://github.com/jaredly/reepl
 
-(defn make-handlers [console-key]
-  {:add-input    #(dispatch [:add-console-input console-key %1 %2])
-   :add-result   #(dispatch [:add-console-result console-key %1 %2])
-   :go-up        #(dispatch [:console-go-up console-key %])
-   :go-down      #(dispatch [:console-go-down console-key %])
-   :clear-items  #(dispatch [:clear-console-items console-key %])
-   :set-text     #(dispatch [:console-set-text console-key %1])
-   :add-log      #(dispatch [:add-console-log console-key %])})
-
 (defn display-output-item
   ([console-key value]
    (display-output-item console-key value false))
   ([console-key value error?]
    [:div
     {:on-click #(dispatch [:focus-console-editor console-key])
-     :class (str "cm-console-item" (when error? " error-cm-console-item"))}
+     :class (str "cm-console-item" (when error? " cm-console-item-error"))}
     value]))
 
 (defn display-repl-item
@@ -44,40 +35,17 @@
   (into [:div] (map (partial display-repl-item console-key) items)))
 
 (defn console [console-key eval-opts]
-  (let [{:keys [add-input
-                add-result
-                go-up
-                go-down
-                clear-items
-                set-text
-                add-log]} (make-handlers console-key)
-
-        {:keys [get-prompt
-                should-eval
-                evaluate]} eval-opts
-
-        items (subscribe [:get-console-items console-key])
-        text  (subscribe [:get-console-current-text console-key])
-        submit (fn [source]
-                 (evaluate #(dispatch [:on-eval-complete console-key %])
-                           source))]
-
+  (let [items (subscribe [:get-console-items console-key])
+        text  (subscribe [:get-console-current-text console-key])]
+    (dispatch-sync [:init-console console-key eval-opts])
     (reagent/create-class
      {:reagent-render
       (fn []
-        [:div.cm-console
-         {:on-click #(dispatch [:focus-console-editor console-key])}
-         [repl-items console-key @items]
-         [editor/editor
-          text
-          (merge
-           editor/default-cm-opts
-           {:on-up go-up
-            :on-down go-down
-            :on-change set-text
-            :on-eval submit
-            :get-prompt get-prompt
-            :should-eval should-eval})]])
+        [:div.cm-console-container
+         [:div.cm-console
+          {:on-click #(dispatch [:focus-console-editor console-key])}
+          [repl-items console-key @items]
+          [editor/editor console-key text]]])
       :component-did-update
       (fn [this]
-        (common/scroll-to-el-bottom! (.-parentElement (reagent/dom-node this))))})))
+        (common/scroll-to-el-bottom! (reagent/dom-node this)))})))

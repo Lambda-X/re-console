@@ -1,17 +1,21 @@
 (ns reactive-console.example
   (:require [reactive-console.replumb-proxy :as replumb-proxy]
-            [reactive-console.core :as rr]
+            [reactive-console.core :as console]
+            [re-frame.core :refer [dispatch subscribe]]
             [reagent.core :as reagent]))
 
-(defonce console-key :cljs-console)
 (enable-console-print!)
 
-(defn ^:export main []
+(defn toggle-verbose []
+  (let [verbose? (atom false)]
+   [:input {:type "button"
+            :value "Toggle verbose"
+            :on-click #(do (swap! verbose? not)
+                           (dispatch [:set-console-eval-opts :cljs-console
+                                      (replumb-proxy/eval-opts @verbose? ["/js/compiled/out"])]))}]))
 
-  (reagent/render [rr/console console-key replumb-proxy/eval-opts] (.getElementById js/document "app"))
-
-  ;; (let [c (.. js/document (createElement "div"))]
-  ;;   (println "Initializing...")
-  ;;   (aset c "innerHTML" "<p>i'm dynamically -  created</p>")
-  ;;   (.. js/document (getElementById "app") (appendChild c)))
-  )
+(defn main []
+  (reagent/render [console/console :cljs-console (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+                  (.getElementById js/document "app"))
+  (reagent/render [toggle-verbose]
+                  (.getElementById js/document "buttons")))

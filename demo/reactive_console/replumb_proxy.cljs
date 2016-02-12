@@ -29,8 +29,9 @@
     (catch :default _
       true)))
 
-(def eval-opts {:get-prompt  replumb/get-prompt
-                :should-eval (complement multiline?)
-                :evaluate    (partial read-eval-call
-                                      (repl-options false
-                                                    (:src-paths ["/js/compiled/out"])))})
+(defn eval-opts
+  [verbose src-path]
+  {:get-prompt  replumb/get-prompt
+   :should-eval (complement multiline?)
+   :evaluate    (partial read-eval-call
+                         (repl-options verbose src-path))})

@@ -4,7 +4,9 @@
                             :hist-pos 0
                             :queued-forms []
                             :history [""]
-                            :cm-instance nil})
+                            :cm-instance nil
+                            :eval-opts {}})
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;           Getters           ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -33,14 +35,25 @@
   [db k]
   (get-in db [:consoles (name k) :queued-forms]))
 
+(defn console-eval-opts
+  [db k]
+  (get-in db [:consoles (name k) :eval-opts]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;       State modifiers       ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn add-console
+(defn init-console
+  [db k eval-opts]
+  (assoc-in db [:consoles (name k)] (assoc initial-console-state :eval-opts eval-opts)))
+
+(defn add-console-instance
   [db k instance]
-  (assoc-in db [:consoles (name k)] (assoc initial-console-state :cm-instance instance)))
+  (assoc-in db [:consoles (name k) :cm-instance] instance))
+
+(defn set-console-eval-opts
+  [db k eval-opts]
+  (assoc-in db [:consoles (name k) :eval-opts] eval-opts))
 
 (defn clear-console-items
   [db k]

@@ -1,4 +1,4 @@
-(ns reactive-console.app)
+(ns re-console.app)
 
 (def initial-console-state {:items []
                             :hist-pos 0

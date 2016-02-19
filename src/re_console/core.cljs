@@ -1,11 +1,11 @@
-(ns reactive-console.core
+(ns re-console.core
   (:require [reagent.core :as reagent :refer [atom]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [reactive-console.handlers :as handlers]
-            [reactive-console.subs :as subs]
-            [reactive-console.editor :as editor]
-            [reactive-console.common :as common]
-            [reactive-console.utils :as utils]))
+            [re-console.handlers :as handlers]
+            [re-console.subs :as subs]
+            [re-console.editor :as editor]
+            [re-console.common :as common]
+            [re-console.utils :as utils]))
 
 ;;; many parts are taken from jaredly's reepl
 ;;; https://github.com/jaredly/reepl

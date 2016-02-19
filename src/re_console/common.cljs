@@ -1,4 +1,4 @@
-(ns reactive-console.common)
+(ns re-console.common)
 
 (defn beginning-of-source
   [exp]

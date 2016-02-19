@@ -1,9 +1,9 @@
-(ns reactive-console.subs
+(ns re-console.subs
   (:require
    [re-frame.core :refer [register-sub]]
    [clairvoyant.core :refer-macros [trace-forms]]
    [re-frame-tracer.core :refer [tracer]]
-   [reactive-console.app :as app])
+   [re-console.app :as app])
   (:require-macros
    [reagent.ratom :refer [reaction]]))
 

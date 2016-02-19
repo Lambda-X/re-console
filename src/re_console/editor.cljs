@@ -1,8 +1,8 @@
-(ns reactive-console.editor
+(ns re-console.editor
   (:require [clojure.string :as str]
             [reagent.core :as reagent]
             [re-frame.core :refer [dispatch subscribe]]
-            [reactive-console.common :as common]
+            [re-console.common :as common]
             [cljsjs.codemirror]
             [cljsjs.codemirror.addon.edit.matchbrackets]
             [cljsjs.codemirror.addon.runmode.runmode]

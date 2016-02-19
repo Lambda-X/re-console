@@ -1,7 +1,7 @@
-(ns reactive-console.replumb-proxy
+(ns re-console.replumb-proxy
   (:require [replumb.core :as replumb]
             [replumb.repl :as replumb-repl]
-            [reactive-console.io :as io]))
+            [re-console.io :as io]))
 
 (defn repl-options
   "Options for replumb.core/read-eval-call.

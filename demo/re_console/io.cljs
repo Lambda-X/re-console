@@ -1,4 +1,4 @@
-(ns reactive-console.io
+(ns re-console.io
   (:import [goog.events EventType]
            [goog.net XhrIo]))
 

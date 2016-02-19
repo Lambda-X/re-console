@@ -1,7 +1,7 @@
-(ns reactive-console.app-test
-  (:require [reactive-console.app :as app]
+(ns re-console.app-test
+  (:require [re-console.app :as app]
             [cljs.test :refer-macros [deftest is async]]
-            [reactive-console.replumb-proxy :as replumb-proxy]))
+            [re-console.replumb-proxy :as replumb-proxy]))
 
 ;; Or doo will exit with an error, see:
 ;; https://github.com/bensu/doo/issues/83#issuecomment-165498172

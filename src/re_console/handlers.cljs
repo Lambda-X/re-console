@@ -1,8 +1,8 @@
-(ns reactive-console.handlers
+(ns re-console.handlers
   (:require [re-frame.core :refer [register-handler dispatch]]
             [clairvoyant.core :refer-macros [trace-forms]]
             [re-frame-tracer.core :refer [tracer]]
-            [reactive-console.app :as app]))
+            [re-console.app :as app]))
 
 ;; (trace-forms {:tracer (tracer :color "green")}
 

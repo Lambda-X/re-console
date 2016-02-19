@@ -1,4 +1,4 @@
-(def +version+ "0.1.0")
+(def +version+ "0.1.1")
 
 (set-env!
  :resource-paths #{"src" "demo" "html"}
@@ -26,7 +26,7 @@
   '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
   '[pandeiro.boot-http    :refer [serve]])
 
-(task-options! pom {:project 'reactive-console
+(task-options! pom {:project 're-console
                     :version +version+}
                jar {})
 
@@ -41,9 +41,9 @@
         (watch)
         (speak)
         (cljs-repl)
-        (cljs :source-map true :optimizations :none)
-        (target)
-        (reload :on-jsload 'reactive-console.example/main)))
+        (reload :on-jsload 're-console.example/main)
+        (cljs :source-map true :optimizations :none)))
+
 
 (deftask build []
   (cljs :optimizations :advanced))

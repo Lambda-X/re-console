@@ -4,20 +4,25 @@
             [re-frame.core :refer [dispatch subscribe]]
             [reagent.core :as reagent]))
 
+(defonce console-key :cljs-console)
+
 (defn toggle-verbose []
-  (let [verbose? (reagent/atom false)]
+  (let [verbose? (subscribe [:get-console-verbose console-key])]
     (fn []
-      [:div
-       [:input {:type "button"
-                     :value "Toggle verbose"
-                     :on-click #(do (swap! verbose? not)
-                                    (dispatch [:set-console-eval-opts :cljs-console
-                                               (replumb-proxy/eval-opts @verbose? ["/js/compiled/out"])]))}]
-       [:span "Now is " (if (false? @verbose?) "false" "true")]])))
+      [:div.buttons-container
+       [:input.buttons-element
+        {:type "button"
+         :value "Toggle verbose"
+         :on-click #(do (dispatch [:toggle-verbose console-key])
+                        (dispatch [:set-console-eval-opts console-key
+                                               (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
+       [:span.buttons-element
+        "Now is " [:strong (if (false? @verbose?) "false" "true")]]])))
 
 (defn ^:export main []
   (enable-console-print!)
-  (reagent/render [console/console :cljs-console (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+  (dispatch [:init-verbose console-key])
+  (reagent/render [console/console console-key (replumb-proxy/eval-opts false ["/js/compiled/out"])]
                   (.getElementById js/document "app"))
   (reagent/render [toggle-verbose]
                   (.getElementById js/document "buttons")))

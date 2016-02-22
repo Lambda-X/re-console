@@ -11,7 +11,7 @@
 
 (def console-key :cljs-console)
 
-(def eval-opts replumb-proxy/eval-opts)
+(def eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"]))
 
 (defn submit
   [db k source]
@@ -23,7 +23,9 @@
   (let [created? (app/console-created? @db console-key)]
     (is (= false created?) "The console should be nil"))
 
-  (let [db (app/add-console @db console-key {:placeholder "js-object"})
+  (let [db (-> @db
+               (app/init-console console-key eval-opts)
+               (app/add-console-instance console-key {:placeholder "js-object"}))
         created? (app/console-created? db console-key)
         items (app/console-items db console-key)
         queued-forms (app/queued-forms db console-key)
@@ -36,10 +38,10 @@
     (is (= (-> history first) "") "The first and only item should be an empty string")
     (is (= 0 hist-pos) "The history position should be 0")))
 
-
 (deftest evaluate
   (let [db (-> @db
-               (app/add-console console-key {:placeholder "js-object"})
+               (app/init-console console-key eval-opts)
+               (app/add-console-instance console-key {:placeholder "js-object"})
                (submit console-key "123")
                (submit console-key "(inc 10)"))
         items (app/console-items db console-key)

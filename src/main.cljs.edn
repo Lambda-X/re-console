@@ -1,3 +1,0 @@
-{:require  [re-console.example]
- :init-fns [re-console.example/main]
- :compiler-options {}}

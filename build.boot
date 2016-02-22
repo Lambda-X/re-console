@@ -46,7 +46,9 @@
         (speak)
         (cljs-repl)
         (reload :on-jsload 're-console.example/main)
-        (cljs :source-map true :optimizations :none)))
+        (cljs :optimizations :none
+              :source-map true
+              :compiler-options {:source-map-timestamp true})))
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})

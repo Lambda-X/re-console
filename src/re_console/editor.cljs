@@ -79,8 +79,8 @@
           (.on inst "viewportChange"
                (fn []
                  (let [el (reagent/dom-node this)
-                       cm-console (.-parentElement el)
-                       box (.-parentElement cm-console)]
+                       re-console (.-parentElement el)
+                       box (.-parentElement re-console)]
                    (common/scroll-to-el-bottom! box))))
 
           (.on inst "change"

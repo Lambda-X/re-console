@@ -16,13 +16,13 @@
   ([console-key value error?]
    [:div
     {:on-click #(dispatch [:focus-console-editor console-key])
-     :class (str "cm-console-item" (when error? " cm-console-item-error"))}
+     :class (str "re-console-item" (when error? " re-console-item-error"))}
     value]))
 
 (defn display-repl-item
   [console-key item]
   (if-let [text (:text item)]
-    [:div.cm-console-item
+    [:div.re-console-item
      {:on-click #(do (dispatch [:console-set-text console-key text])
                      (dispatch [:focus-console-editor console-key]))}
      [utils/colored-text (str (:ns item) "=> " text)]]
@@ -41,8 +41,8 @@
     (reagent/create-class
      {:reagent-render
       (fn []
-        [:div.cm-console-container
-         [:div.cm-console
+        [:div.re-console-container
+         [:div.re-console
           {:on-click #(dispatch [:focus-console-editor console-key])}
           [repl-items console-key @items]
           [editor/editor console-key text]]])

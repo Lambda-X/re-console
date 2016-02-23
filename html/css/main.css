@@ -15,7 +15,7 @@ body, html {
     margin-right: 5px;
 }
 
-.cm-console-container {
+.re-console-container {
     overflow-y: scroll;
     padding: 10px;
     height: 400px;
@@ -26,27 +26,27 @@ body, html {
     -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
 }
 
-.cm-console .CodeMirror {
+.re-console .CodeMirror {
     height: auto;
     font-size: 13px;
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
     margin-bottom: 20px;
 }
 
-.cm-console .CodeMirror-code {
+.re-console .CodeMirror-code {
     background-color: #EEE;
 }
 
-.cm-console-item, .cm-console-item pre, .cm-console-item-error pre {
+.re-console-item, .re-console-item pre, .re-console-item-error pre {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
     font-size: 13px;
     opacity: 0.7;
 }
 
-.cm-console-item-error {
+.re-console-item-error {
     color: #e60000;
 }
 
-.cm-console .CodeMirror-lines, .cm-console .CodeMirror pre {
+.re-console .CodeMirror-lines, .re-console .CodeMirror pre {
     padding: 0;
 }

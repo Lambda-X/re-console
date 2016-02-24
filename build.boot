@@ -20,11 +20,11 @@
                  [cljsjs/codemirror           "5.10.0-0"]])
 
 (require
-  '[adzerk.boot-cljs      :refer [cljs]]
-  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
-  '[adzerk.boot-reload    :refer [reload]]
+  '[adzerk.boot-cljs             :refer [cljs]]
+  '[adzerk.boot-cljs-repl        :refer [cljs-repl start-repl]]
+  '[adzerk.boot-reload           :refer [reload]]
   '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
-  '[pandeiro.boot-http    :refer [serve]])
+  '[pandeiro.boot-http           :refer [serve]])
 
 (task-options! pom {:project 're-console
                     :version +version+
@@ -33,11 +33,20 @@
                test-cljs {:js-env :phantom
                           :out-file "phantom-tests.js"})
 
+;; This prevents a name collision WARNING between the test task and
+;; clojure.core/test, a function that nobody really uses or cares
+;; about.
+(ns-unmap 'boot.user 'test)
+
+(deftask test []
+  (merge-env! :source-paths #{"test" "src" "demo"})
+  (comp (speak)
+        (test-cljs)))
+
 (deftask auto-test []
   (merge-env! :source-paths #{"test" "src" "demo"})
   (comp (watch)
-        (speak)
-        (test-cljs )))
+        (test)))
 
 (deftask dev []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})

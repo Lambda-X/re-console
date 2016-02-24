@@ -1,6 +1,7 @@
-(def +version+ "0.1.0")
+(def +version+ "0.1.1")
 
 (set-env!
+ :resource-paths #{"html" "demo" "src"}
  :dependencies '[[adzerk/boot-cljs                    "1.7.228-1"      :scope "test"]
                  [pandeiro/boot-http                  "0.7.1-SNAPSHOT" :scope "test"]
                  [adzerk/boot-reload                  "0.4.5"          :scope "test"]
@@ -39,17 +40,16 @@
 (ns-unmap 'boot.user 'test)
 
 (deftask test []
-  (merge-env! :source-paths #{"test" "src" "demo"})
+  (merge-env! :source-paths #{"test"})
   (comp (speak)
         (test-cljs)))
 
 (deftask auto-test []
-  (merge-env! :source-paths #{"test" "src" "demo"})
+  (merge-env! :source-paths #{"test"})
   (comp (watch)
         (test)))
 
 (deftask dev []
-  (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
   (comp (serve)
         (watch)
         (speak)
@@ -58,6 +58,9 @@
         (cljs :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true})))
+
+(deftask install-jar []
+  (comp (pom) (jar) (install)))
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})

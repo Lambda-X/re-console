@@ -6,6 +6,13 @@
 
 (defonce console-key :cljs-console)
 
+(defonce example-style {:font-size "15px"
+                        :font-family "Menlo, Monaco, Consolas, monospace"
+                        :error-msg-color "#e60000"
+                        :background-color "white"
+                        :height "400"
+                        :padding "10"})
+
 (defn toggle-verbose []
   (let [verbose? (subscribe [:get-console-verbose console-key])]
     (fn []
@@ -30,7 +37,7 @@
 (defn ^:export main []
   (enable-console-print!)
   (dispatch [:init-verbose console-key])
-  (reagent/render [console/console console-key (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+  (reagent/render [console/console console-key example-style (replumb-proxy/eval-opts false ["/js/compiled/out"])]
                   (.getElementById js/document "app"))
   (reagent/render [toggle-verbose]
                   (.getElementById js/document "buttons")))

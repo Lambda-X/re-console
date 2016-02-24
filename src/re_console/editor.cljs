@@ -47,7 +47,7 @@
          (compare-position-fn cno (common/beginning-of-source (.getValue inst))))))
 
 (defn editor
-  [console-key value-atom]
+  [console-key style value-atom]
   (let [cm (subscribe [:get-console console-key])
         {:keys [add-input
                 add-result
@@ -72,7 +72,13 @@
                       :autofocus true
                       :extraKeys #js {"Shift-Enter" "newlineAndIndent"}
                       :value (str ((:get-prompt @eval-opts)) @value-atom)
-                      :mode "clojure"}))]
+                      :mode "clojure"}))
+              code-mirror-el (.-firstChild el)]
+
+          (set! (.-fontFamily (.-style code-mirror-el)) (:font-family style))
+          (set! (.-fontSize (.-style code-mirror-el)) (:font-size style))
+          (set! (.-backgroundColor (.-style code-mirror-el)) (:background-color style))
+
           (dispatch [:add-console-instance console-key inst])
           (move-to-end inst)
 

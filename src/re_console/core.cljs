@@ -11,30 +11,31 @@
 ;;; https://github.com/jaredly/reepl
 
 (defn display-output-item
-  ([console-key value]
-   (display-output-item console-key value false))
-  ([console-key value error?]
+  ([console-key style value]
+   (display-output-item console-key style value false))
+  ([console-key style value error?]
    [:div
     {:on-click #(dispatch [:focus-console-editor console-key])
-     :class (str "re-console-item" (when error? " re-console-item-error"))}
+     :style (merge {:opacity 0.7}
+                   (select-keys style [:font-size :font-family])
+                   (when error? {:color (:error-msg-color style)}))}
     value]))
 
 (defn display-repl-item
-  [console-key item]
+  [console-key style item]
   (if-let [text (:text item)]
     [:div.re-console-item
      {:on-click #(do (dispatch [:console-set-text console-key text])
                      (dispatch [:focus-console-editor console-key]))}
-     [utils/colored-text (str (:ns item) "=> " text)]]
-
+     [utils/colored-text (str (:ns item) "=> " text) (select-keys style [:font-size :font-family])]]
     (if (= :error (:type item))
-      (display-output-item console-key (.-message (:value item)) true)
-      (display-output-item console-key (:value item)))))
+      (display-output-item console-key style (.-message (:value item)) true)
+      (display-output-item console-key style (:value item)))))
 
-(defn repl-items [console-key items]
-  (into [:div] (map (partial display-repl-item console-key) items)))
+(defn repl-items [console-key style items]
+  (into [:div] (map #(display-repl-item console-key style %) items)))
 
-(defn console [console-key eval-opts]
+(defn console [console-key style eval-opts]
   (let [items (subscribe [:get-console-items console-key])
         text  (subscribe [:get-console-current-text console-key])]
     (dispatch-sync [:init-console console-key eval-opts])
@@ -42,10 +43,12 @@
      {:reagent-render
       (fn []
         [:div.re-console-container
+         {:style (merge {:overflow-y "scroll"}
+                        (select-keys style [:background-color :height :padding]))}
          [:div.re-console
           {:on-click #(dispatch [:focus-console-editor console-key])}
-          [repl-items console-key @items]
-          [editor/editor console-key text]]])
+          [repl-items console-key style @items]
+          [editor/editor console-key style text]]])
       :component-did-update
       (fn [this]
         (common/scroll-to-el-bottom! (reagent/dom-node this)))})))

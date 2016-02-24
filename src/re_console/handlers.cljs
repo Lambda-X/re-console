@@ -24,6 +24,13 @@
    db))
 
 (register-handler
+ :set-console-theme
+ (fn set-console-theme [db [_ console-key theme]]
+   (when-let [instance (app/console db console-key)]
+     (.setOption instance "theme" theme))
+   db))
+
+(register-handler
  :clear-console-items
  (fn clear-console-items [db [_ console-key]]
    (dispatch [:focus-console-editor console-key])

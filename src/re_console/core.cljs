@@ -43,10 +43,10 @@
      {:reagent-render
       (fn []
         [:div.re-console-container
-         {:style (merge {:overflow-y "scroll"}
+         {:on-click #(dispatch [:focus-console-editor console-key])
+          :style (merge {:overflow-y "scroll"}
                         (select-keys style [:background-color :height :padding]))}
          [:div.re-console
-          {:on-click #(dispatch [:focus-console-editor console-key])}
           [repl-items console-key style @items]
           [editor/editor console-key style text]]])
       :component-did-update

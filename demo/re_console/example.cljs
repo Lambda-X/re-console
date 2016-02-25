@@ -24,15 +24,7 @@
                         (dispatch [:set-console-eval-opts console-key
                                                (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
        [:span.buttons-element
-        "Now is " [:strong (if (false? @verbose?) "false" "true")]]
-       [:div
-        [:span.buttons-element "Theme"]
-        [:select {:on-change (fn [evt]
-                               (let [theme (-> evt .-target .-value)]
-                                 (dispatch [:set-console-theme console-key theme])))}
-         [:option "default"]
-         [:option "elegant"]
-         [:option "erlang-dark"]]]])))
+        "Now is " [:strong (if (false? @verbose?) "false" "true")]]])))
 
 (defn ^:export main []
   (enable-console-print!)

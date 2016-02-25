@@ -16,7 +16,8 @@
   ([console-key style value error?]
    [:div
     {:on-click #(dispatch [:focus-console-editor console-key])
-     :style (merge(select-keys style [:font-size :font-family :opacity])
+     :style (merge {:opacity 0.7}
+                   (select-keys style [:font-size :font-family])
                    (when error? {:color (:error-msg-color style)}))}
     value]))
 
@@ -26,7 +27,7 @@
     [:div.re-console-item
      {:on-click #(do (dispatch [:console-set-text console-key text])
                      (dispatch [:focus-console-editor console-key]))}
-     [utils/colored-text (str (:ns item) "=> " text) (select-keys style [:font-size :font-family :opacity])]]
+     [utils/colored-text (str (:ns item) "=> " text) (select-keys style [:font-size :font-family])]]
     (if (= :error (:type item))
       (display-output-item console-key style (.-message (:value item)) true)
       (display-output-item console-key style (:value item)))))

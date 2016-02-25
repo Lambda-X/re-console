@@ -1,8 +1,8 @@
-(ns reactive-console.editor
+(ns re-console.editor
   (:require [clojure.string :as str]
             [reagent.core :as reagent]
             [re-frame.core :refer [dispatch subscribe]]
-            [reactive-console.common :as common]
+            [re-console.common :as common]
             [cljsjs.codemirror]
             [cljsjs.codemirror.addon.edit.matchbrackets]
             [cljsjs.codemirror.addon.runmode.runmode]
@@ -21,6 +21,15 @@
            last-line (.lastLine inst)]
        (= last-line (.-line pos))))})
 
+(defn handlers [console-key]
+  {:add-input    #(dispatch [:add-console-input console-key %1 %2])
+   :add-result   #(dispatch [:add-console-result console-key %1 %2])
+   :go-up        #(dispatch [:console-go-up console-key %])
+   :go-down      #(dispatch [:console-go-down console-key %])
+   :clear-items  #(dispatch [:clear-console-items console-key %])
+   :set-text     #(dispatch [:console-set-text console-key %1])
+   :add-log      #(dispatch [:add-console-log console-key %])})
+
 (defn move-to-end
   [cm]
   (let [last-line (.lastLine cm)
@@ -38,16 +47,17 @@
          (compare-position-fn cno (common/beginning-of-source (.getValue inst))))))
 
 (defn editor
-  [value-atom {:keys [on-change
-                      on-eval
-                      on-up
-                      on-down
-                      should-go-up
-                      should-go-down
-                      should-eval
-                      get-prompt]}]
+  [console-key style value-atom]
+  (let [cm (subscribe [:get-console console-key])
+        {:keys [add-input
+                add-result
+                should-go-up
+                should-go-down
+                go-up
+                go-down
+                set-text]} (merge (handlers console-key) default-cm-opts)
+        eval-opts (subscribe [:get-console-eval-opts console-key])]
 
-  (let [cm (subscribe [:get-console :cljs-console])]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
@@ -61,24 +71,29 @@
                       :matchBrackets true
                       :autofocus true
                       :extraKeys #js {"Shift-Enter" "newlineAndIndent"}
-                      :value (str (get-prompt) @value-atom)
-                      :mode "clojure"}))]
+                      :value (str ((:get-prompt @eval-opts)) @value-atom)
+                      :mode "clojure"}))
+              code-mirror-el (.-firstChild el)]
 
-          (dispatch [:add-console :cljs-console inst])
+          (set! (.-fontFamily (.-style code-mirror-el)) (:font-family style))
+          (set! (.-fontSize (.-style code-mirror-el)) (:font-size style))
+          (set! (.-backgroundColor (.-style code-mirror-el)) (:background-color style))
+
+          (dispatch [:add-console-instance console-key inst])
           (move-to-end inst)
 
           (.on inst "viewportChange"
                (fn []
                  (let [el (reagent/dom-node this)
-                       cm-console (.-parentElement el)
-                       box (.-parentElement cm-console)]
+                       re-console (.-parentElement el)
+                       box (.-parentElement re-console)]
                    (common/scroll-to-el-bottom! box))))
 
           (.on inst "change"
                (fn []
                  (let [value (common/source-without-prompt (.getValue inst))]
                    (when-not (= value @value-atom)
-                     (on-change value)))))
+                     (set-text value)))))
 
           (.on inst "keydown"
                (fn [inst evt]
@@ -87,27 +102,27 @@
                    (case (.-keyCode evt)
                      ;; enter
                      13 (let [source (common/source-without-prompt (.getValue inst))]
-                          (when (should-eval source inst evt)
+                          (when ((:should-eval @eval-opts) source inst evt)
                             (.preventDefault evt)
-                            (on-eval source)))
+                            ((:evaluate @eval-opts) #(dispatch [:on-eval-complete console-key %]) source)))
                      ;; up
                      38 (let [source (common/source-without-prompt (.getValue inst))]
                           (when (and (not (.-shiftKey evt))
                                      (should-go-up source inst))
                             (.preventDefault evt)
-                            (on-up)))
+                            (go-up)))
                      ;; down
                      40 (let [source (common/source-without-prompt (.getValue inst))]
                           (when (and (not (.-shiftKey evt))
                                      (should-go-down source inst))
                             (.preventDefault evt)
-                            (on-down)))
+                            (go-down)))
                      :none))))))
 
       :component-did-update
       (fn [this old-argv]
         (when-not (= @value-atom (common/source-without-prompt (.getValue @cm)))
-          (.setValue @cm (str (get-prompt) @value-atom))
+          (.setValue @cm (str ((:get-prompt @eval-opts)) @value-atom))
           (move-to-end @cm)))
 
       :reagent-render

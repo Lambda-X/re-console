@@ -1,10 +1,6 @@
-(ns reactive-console.io
+(ns re-console.io
   (:import [goog.events EventType]
            [goog.net XhrIo]))
-
-;;;;;;;;;;
-;;  IO  ;;
-;;;;;;;;;;
 
 (defn fetch-file!
   "Very simple implementation of XMLHttpRequests that given a file path

@@ -1,4 +1,4 @@
-(ns reactive-console.example-test
+(ns re-console.example-test
   (:require [cljs.test :refer-macros [deftest testing is]]))
 
 (deftest silly-test

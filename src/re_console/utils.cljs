@@ -1,4 +1,4 @@
-(ns reactive-console.utils
+(ns re-console.utils
   (:require [reagent.core :as reagent]))
 
 (defn colored-text [text style]

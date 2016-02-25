@@ -1,9 +1,9 @@
-(ns reactive-console.subs
+(ns re-console.subs
   (:require
    [re-frame.core :refer [register-sub]]
    [clairvoyant.core :refer-macros [trace-forms]]
    [re-frame-tracer.core :refer [tracer]]
-   [reactive-console.app :as app])
+   [re-console.app :as app])
   (:require-macros
    [reagent.ratom :refer [reaction]]))
 
@@ -38,5 +38,9 @@
  (fn [db [_ console-key]]
    (reaction (not (empty? (app/queued-forms @db console-key))))))
 
+(register-sub
+ :get-console-eval-opts
+ (fn [db [_ console-key]]
+   (reaction (app/console-eval-opts @db console-key))))
 
 ;; )

@@ -1,3 +1,0 @@
-{:require  [reactive-console.example]
- :init-fns [reactive-console.example/main]
- :compiler-options {}}

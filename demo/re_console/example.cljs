@@ -11,7 +11,8 @@
                         :error-msg-color "#e60000"
                         :background-color "white"
                         :height "400"
-                        :padding "10"})
+                        :padding "10"
+                        :opacity 0.3})
 
 (defn toggle-verbose []
   (let [verbose? (subscribe [:get-console-verbose console-key])]

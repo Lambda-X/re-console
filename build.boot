@@ -59,9 +59,9 @@
               :source-map true
               :compiler-options {:source-map-timestamp true})))
 
+(deftask install-jar []
+  (comp (pom) (jar) (install)))
+
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
   (cljs :optimizations :advanced))
-
-(deftask install-jar []
-  (comp (pom) (jar) (install)))

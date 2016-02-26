@@ -3,18 +3,17 @@
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
   font-family: monospace;
-  height: auto;
+  height: 300px;
   color: black;
-  margin-bottom: 20px;
 }
 
 /* PADDING */
 
 .CodeMirror-lines {
-  padding: 0;
+  padding: 4px 0; /* Vertical padding around content */
 }
 .CodeMirror pre {
-  padding: 0;
+  padding: 0 4px; /* Horizontal padding of content */
 }
 
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -333,3 +332,42 @@ div.CodeMirror-dragcursors {
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
+
+/* re-console */
+
+.re-console-container {
+    overflow-y: scroll;
+    padding: 10px;
+    height: 400px;
+    margin: 0 0;
+    border-radius: 10px;
+    background-color: #EEE;
+    -webkit-transform: translateZ(0);
+    -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
+}
+
+.re-console .CodeMirror {
+    height: auto;
+    font-size: 13px;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    margin-bottom: 20px;
+}
+
+.re-console .CodeMirror-code {
+    background-color: #EEE;
+}
+
+.re-console-item, .re-console-item pre, .re-console-item-error pre {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.re-console-item-error {
+    color: #e60000;
+}
+
+.re-console .CodeMirror-lines, .re-console .CodeMirror pre {
+    padding: 0;
+}
+

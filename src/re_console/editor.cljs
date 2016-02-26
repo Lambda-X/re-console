@@ -1,6 +1,5 @@
 (ns re-console.editor
-  (:require [clojure.string :as str]
-            [reagent.core :as reagent]
+  (:require [reagent.core :as reagent]
             [re-frame.core :refer [dispatch subscribe]]
             [re-console.common :as common]
             [cljsjs.codemirror]
@@ -9,7 +8,18 @@
             [cljsjs.codemirror.addon.runmode.colorize]
             [cljsjs.codemirror.mode.clojure]))
 
-(def default-cm-opts
+(defn default-cm-options
+  [initial-prompt]
+  {:lineNumbers false
+   :viewportMargin js/Infinity
+   :lineWrapping true
+   :matchBrackets true
+   :autofocus true
+   :extraKeys #js {"Shift-Enter" "newlineAndIndent"}
+   :value initial-prompt
+   :mode "clojure"})
+
+(def default-cm-handlers
   {:should-go-up
    (fn [source inst]
      (let [pos (.getCursor inst)]
@@ -46,80 +56,69 @@
          (zero? lno)
          (compare-position-fn cno (common/beginning-of-source (.getValue inst))))))
 
-(defn editor
-  [console-key value-atom]
-  (let [cm (subscribe [:get-console console-key])
-        {:keys [add-input
-                add-result
-                should-go-up
-                should-go-down
-                go-up
-                go-down
-                set-text]} (merge (handlers console-key) default-cm-opts)
-        eval-opts (subscribe [:get-console-eval-opts console-key])]
+(defn on-viewport-change [this]
+  (fn []
+    (let [el (reagent/dom-node this)
+          re-console (.-parentElement el)
+          box (.-parentElement re-console)]
+      (common/scroll-to-el-bottom! box))))
 
+(defn on-change [inst text {:keys [set-text]}]
+  (fn []
+    (let [value (common/source-without-prompt (.getValue inst))]
+      (when-not (= value @text)
+        (set-text  value)))))
+
+(defn on-keydown [console-key
+               {:keys [should-go-up should-go-down go-up go-down]}
+               eval-opts]
+  (fn [inst evt]
+    (if (modifying-prompt? inst (.-keyCode evt))
+      (.preventDefault evt)
+      (case (.-keyCode evt)
+        ;; enter
+        13 (let [source (common/source-without-prompt (.getValue inst))]
+             (when ((:should-eval @eval-opts) source inst evt)
+               (.preventDefault evt)
+               ((:evaluate @eval-opts) #(dispatch [:on-eval-complete console-key %]) source)))
+        ;; up
+        38 (let [source (common/source-without-prompt (.getValue inst))]
+             (when (and (not (.-shiftKey evt))
+                        (should-go-up source inst))
+               (.preventDefault evt)
+               (go-up)))
+        ;; down
+        40 (let [source (common/source-without-prompt (.getValue inst))]
+             (when (and (not (.-shiftKey evt))
+                        (should-go-down source inst))
+               (.preventDefault evt)
+               (go-down)))
+        :none))))
+
+(defn console-editor
+  [console-key text]
+  (let [cm (subscribe [:get-console console-key])
+        handlers  (merge (handlers console-key) default-cm-handlers)
+        eval-opts (subscribe [:get-console-eval-opts console-key])]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
         (let [el (reagent/dom-node this)
               inst (js/CodeMirror.
                     el
-                    (clj->js
-                     {:lineNumbers false
-                      :viewportMargin js/Infinity
-                      :lineWrapping true
-                      :matchBrackets true
-                      :autofocus true
-                      :extraKeys #js {"Shift-Enter" "newlineAndIndent"}
-                      :value (str ((:get-prompt @eval-opts)) @value-atom)
-                      :mode "clojure"}))]
+                    (clj->js (default-cm-options (str ((:get-prompt @eval-opts)) @text))))]
           (dispatch [:add-console-instance console-key inst])
           (move-to-end inst)
-
-          (.on inst "viewportChange"
-               (fn []
-                 (let [el (reagent/dom-node this)
-                       re-console (.-parentElement el)
-                       box (.-parentElement re-console)]
-                   (common/scroll-to-el-bottom! box))))
-
-          (.on inst "change"
-               (fn []
-                 (let [value (common/source-without-prompt (.getValue inst))]
-                   (when-not (= value @value-atom)
-                     (set-text value)))))
-
-          (.on inst "keydown"
-               (fn [inst evt]
-                 (if (modifying-prompt? inst (.-keyCode evt))
-                   (.preventDefault evt)
-                   (case (.-keyCode evt)
-                     ;; enter
-                     13 (let [source (common/source-without-prompt (.getValue inst))]
-                          (when ((:should-eval @eval-opts) source inst evt)
-                            (.preventDefault evt)
-                            ((:evaluate @eval-opts) #(dispatch [:on-eval-complete console-key %]) source)))
-                     ;; up
-                     38 (let [source (common/source-without-prompt (.getValue inst))]
-                          (when (and (not (.-shiftKey evt))
-                                     (should-go-up source inst))
-                            (.preventDefault evt)
-                            (go-up)))
-                     ;; down
-                     40 (let [source (common/source-without-prompt (.getValue inst))]
-                          (when (and (not (.-shiftKey evt))
-                                     (should-go-down source inst))
-                            (.preventDefault evt)
-                            (go-down)))
-                     :none))))))
+          (.on inst "viewportChange" (on-viewport-change this))
+          (.on inst "change" (on-change inst text handlers))
+          (.on inst "keydown" (on-keydown console-key handlers eval-opts))))
 
       :component-did-update
       (fn [this old-argv]
-        (when-not (= @value-atom (common/source-without-prompt (.getValue @cm)))
-          (.setValue @cm (str ((:get-prompt @eval-opts)) @value-atom))
+        (when-not (= @text (common/source-without-prompt (.getValue @cm)))
+          (.setValue @cm (str ((:get-prompt @eval-opts)) @text))
           (move-to-end @cm)))
-
       :reagent-render
       (fn []
-        @value-atom
+        @text
         [:div])})))

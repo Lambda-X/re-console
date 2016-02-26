@@ -138,8 +138,8 @@
   [db k]
   (update-in db [:consoles (name k) :hist-pos]
              (fn [pos] (if (<= pos 0)
-                        0
-                        (dec pos)))))
+                         0
+                         (dec pos)))))
 
 (defn clear-console-queued-forms
   [db k]
@@ -158,15 +158,15 @@
 (defn set-next-queued-form-if-any
   [db k]
   (if-let [form (first (queued-forms db k))]
-       (-> db
-           (set-console-text k form)
-           (drop-first-queued-form k))
-       db))
+    (-> db
+        (set-console-text k form)
+        (drop-first-queued-form k))
+    db))
 
 (defn on-eval-complete
   [db k {:keys [prev-ns source success? result]}]
   (-> db
-       (set-console-text k source)
-       (add-console-input k source prev-ns)
-       (add-console-result k (not success?) result)
-       (set-next-queued-form-if-any k)))
+      (set-console-text k source)
+      (add-console-input k source prev-ns)
+      (add-console-result k (not success?) result)
+      (set-next-queued-form-if-any k)))

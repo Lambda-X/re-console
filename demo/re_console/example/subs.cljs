@@ -10,7 +10,7 @@
 
 (register-sub
  :get-console-verbose
- (fn [db [_ console-key]]
-   (reaction (get-in @db [:consoles (name console-key) :verbose]))))
+ (fn [db [_]]
+   (reaction (get-in @db [:options :verbose]))))
 
 ;; )

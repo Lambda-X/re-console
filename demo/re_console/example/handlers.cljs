@@ -6,14 +6,14 @@
 ;; (trace-forms {:tracer (tracer :color "green")}
 
 (register-handler
- :init-verbose
- (fn init-verbose [db [_  console-key]]
-   (assoc-in db [:consoles (name console-key) :verbose] false)))
+ :init-options
+ (fn init-verbose [db [_]]
+   (assoc-in db [:options :verbose] false)))
 
 
 (register-handler
  :toggle-verbose
- (fn toggle-verbose [db [_  console-key]]
-   (update-in db [:consoles (name console-key) :verbose] not)))
+ (fn toggle-verbose [db [_]]
+   (update-in db [:options :verbose] not)))
 
 ;; )

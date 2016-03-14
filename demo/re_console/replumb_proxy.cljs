@@ -3,10 +3,7 @@
             [replumb.repl :as replumb-repl]
             [re-console.io :as io]))
 
-(defn repl-options
-  "Options for replumb.core/read-eval-call.
-
-  Read the docs at https://github.com/ScalaConsultants/replumb"
+(defn replumb-options
   [verbose? src-paths]
   (merge (replumb/browser-options src-paths io/fetch-file!)
          {:warning-as-error true
@@ -34,4 +31,4 @@
   {:get-prompt  replumb/get-prompt
    :should-eval (complement multiline?)
    :evaluate    (partial read-eval-call
-                         (repl-options verbose src-path))})
+                         (replumb-options verbose src-path))})

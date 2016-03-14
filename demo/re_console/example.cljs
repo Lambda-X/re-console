@@ -6,22 +6,14 @@
 
 (defonce console-key :cljs-console)
 
-(defonce example-style {:font-size "15px"
-                        :font-family "Menlo, Monaco, Consolas, monospace"
-                        :error-msg-color "#e60000"
-                        :background-color "white"
-                        :height "400"
-                        :padding "10"
-                        :opacity 0.3})
-
 (defn toggle-verbose []
-  (let [verbose? (subscribe [:get-console-verbose console-key])]
+  (let [verbose? (subscribe [:get-console-verbose])]
     (fn []
       [:div.buttons-container
        [:input.buttons-element
         {:type "button"
          :value "Toggle verbose"
-         :on-click #(do (dispatch [:toggle-verbose console-key])
+         :on-click #(do (dispatch [:toggle-verbose])
                         (dispatch [:set-console-eval-opts console-key
                                                (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
        [:span.buttons-element
@@ -29,8 +21,8 @@
 
 (defn ^:export main []
   (enable-console-print!)
-  (dispatch [:init-verbose console-key])
-  (reagent/render [console/console console-key example-style (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+  (dispatch [:init-options])
+  (reagent/render [console/console console-key (replumb-proxy/eval-opts false ["/js/compiled/out"])]
                   (.getElementById js/document "app"))
   (reagent/render [toggle-verbose]
                   (.getElementById js/document "buttons")))

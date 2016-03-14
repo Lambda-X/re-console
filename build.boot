@@ -12,7 +12,7 @@
                  [crisptrutski/boot-cljs-test         "0.2.2-SNAPSHOT" :scope "test"]
                  [org.clojars.stumitchell/clairvoyant "0.1.0-SNAPSHOT" :scope "test"]
                  [day8/re-frame-tracer                "0.1.0-SNAPSHOT" :scope "test"]
-
+                 [deraen/boot-sass                    "0.2.1"          :scope "test"]
                  [org.clojure/clojure         "1.7.0"]
                  [org.clojure/clojurescript   "1.7.228"]
                  [reagent                     "0.5.0"]
@@ -25,7 +25,8 @@
   '[adzerk.boot-cljs-repl        :refer [cljs-repl start-repl]]
   '[adzerk.boot-reload           :refer [reload]]
   '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
-  '[pandeiro.boot-http           :refer [serve]])
+  '[pandeiro.boot-http           :refer [serve]]
+  '[deraen.boot-sass             :refer [sass]])
 
 (task-options! pom {:project 're-console
                     :version +version+
@@ -55,13 +56,15 @@
         (speak)
         (cljs-repl)
         (reload :on-jsload 're-console.example/main)
+        (sass)
         (cljs :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true})))
 
-(deftask build []
-  (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
-  (cljs :optimizations :advanced))
-
 (deftask install-jar []
   (comp (pom) (jar) (install)))
+
+(deftask build []
+  (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
+  (comp (sass)
+        (cljs :optimizations :advanced)))

@@ -12,6 +12,7 @@
                  [org.clojars.stumitchell/clairvoyant "0.1.0-SNAPSHOT" :scope "test"]
                  [day8/re-frame-tracer                "0.1.0-SNAPSHOT" :scope "test"]
                  [deraen/boot-sass                    "0.2.1"          :scope "test"]
+                 [adzerk/bootlaces                    "0.1.13"         :scope "test"]
                  [org.clojure/clojure         "1.7.0"]
                  [org.clojure/clojurescript   "1.7.228"]
                  [reagent                     "0.5.0"]
@@ -26,9 +27,12 @@
   '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
   '[pandeiro.boot-http           :refer [serve]]
   '[deraen.boot-sass             :refer [sass]]
-  '[boot-semver.core             :refer :all])
+  '[boot-semver.core             :refer :all]
+  '[adzerk.bootlaces             :refer :all])
 
 (def +version+ (get-version))
+
+(bootlaces! +version+)
 
 (task-options! pom {:project 're-console
                     :version +version+
@@ -72,9 +76,6 @@
         (cljs :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true})))
-
-(deftask install-jar []
-  (comp (pom) (jar) (install)))
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})

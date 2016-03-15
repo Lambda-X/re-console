@@ -1,10 +1,9 @@
-(def +version+ "0.1.0")
-
 (set-env!
  :resource-paths #{"html" "demo" "src"}
  :dependencies '[[adzerk/boot-cljs                    "1.7.228-1"      :scope "test"]
                  [pandeiro/boot-http                  "0.7.1-SNAPSHOT" :scope "test"]
                  [adzerk/boot-reload                  "0.4.5"          :scope "test"]
+                 [degree9/boot-semver                 "1.2.4"          :scope "test"]
                  [adzerk/boot-cljs-repl               "0.3.0"          :scope "test"]
                  [com.cemerick/piggieback             "0.2.1"          :scope "test"]
                  [weasel                              "0.7.0"          :scope "test"]
@@ -26,7 +25,10 @@
   '[adzerk.boot-reload           :refer [reload]]
   '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
   '[pandeiro.boot-http           :refer [serve]]
-  '[deraen.boot-sass             :refer [sass]])
+  '[deraen.boot-sass             :refer [sass]]
+  '[boot-semver.core             :refer :all])
+
+(def +version+ (get-version))
 
 (task-options! pom {:project 're-console
                     :version +version+
@@ -40,6 +42,15 @@
 ;; about.
 (ns-unmap 'boot.user 'test)
 
+(deftask version-file
+  "A task that includes the version.properties file in the fileset."
+  []
+  (with-pre-wrap [fileset]
+    (boot.util/info "Add version.properties...\n")
+    (-> fileset
+        (add-resource (java.io.File. ".") :include #{#"^version\.properties$"})
+        commit!)))
+
 (deftask test []
   (merge-env! :source-paths #{"test"})
   (comp (speak)
@@ -51,7 +62,8 @@
         (test)))
 
 (deftask dev []
-  (comp (serve)
+  (comp (version-file)
+        (serve)
         (watch)
         (speak)
         (cljs-repl)
@@ -66,5 +78,6 @@
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
-  (comp (sass)
+  (comp (version-file)
+        (sass)
         (cljs :optimizations :advanced)))

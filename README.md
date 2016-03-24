@@ -38,6 +38,8 @@ displayed after each evaluation).
 * `:should-eval`: a predicate function that takes the source as input (the
 expression to evaluate) and returns true or false depending on whether
 it can be evaluated. If `false`, the cursor will be placed on a new line.
+* `to-str-fn`: a one-arity function that converts the result to a string.
+If the result is already a string simply use `identity`.
 * `evaluate`: the main evaluation function, takes as arguments a callback
 function (called after evaluation) and the source to evaluate.
 Will be called if `should-eval` returns `true`.
@@ -46,7 +48,8 @@ The callback function will be called with a map as parameter containing the
 following keys:
 
 * `success?`: if `true` the evaluation has succeded
-* `result`: the result of the evaluation, can be a valid result or an error
+* `result`: the result of the evaluation (as it is), can be a valid result or an
+error
 * `prev-ns`: a string indicating the namespace the evaluation took place in
 * `source`: the original source
 

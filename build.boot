@@ -17,7 +17,7 @@
                  [org.clojure/clojurescript   "1.7.228"]
                  [reagent                     "0.5.0"]
                  [re-frame                    "0.5.0"]
-                 [replumb/replumb             "0.1.3-SNAPSHOT"]
+                 [replumb/replumb             "0.2.1"]
                  [cljsjs/codemirror           "5.10.0-0"]])
 
 (require

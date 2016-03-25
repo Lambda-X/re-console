@@ -36,7 +36,7 @@
 
 (task-options! pom {:project 're-console
                     :version +version+
-                    :url "https://github.com/ScalaConsultants/re-console"
+                    :url "https://github.com/Lambda-X/re-console"
                     :description "A reactive console based on re-frame"}
                test-cljs {:js-env :phantom
                           :out-file "phantom-tests.js"})

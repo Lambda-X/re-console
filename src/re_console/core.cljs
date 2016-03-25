@@ -20,18 +20,20 @@
     value]))
 
 (defn display-console-item
-  [console-key item]
+  [console-key to-str-fn item]
   (if-let [text (:text item)]
-    [:div.re-console-item
-     {:on-click #(do (dispatch [:console-set-text console-key text])
-                     (dispatch [:focus-console-editor console-key]))}
+    [:div.re-console-item {:on-click #(do (dispatch [:console-set-text console-key text])
+                                          (dispatch [:focus-console-editor console-key]))}
      [utils/colored-text (str (:ns item) "=> " text)]]
-    (if (= :error (:type item))
-      (display-console-output-item console-key (.-message (:value item)) true)
-      (display-console-output-item console-key (:value item)))))
+    (display-console-output-item console-key
+                                 (to-str-fn (:value item))
+                                 (= :error (:type item)))))
 
-(defn console-items [console-key items]
-  (into [:div] (map (partial display-console-item console-key) items)))
+(defn console-items
+  ([console-key items]
+   (into [:div] (map (partial display-console-item console-key identity) items)))
+  ([console-key items to-str-fn]
+   (into [:div] (map (partial display-console-item console-key to-str-fn) items))))
 
 (defn console [console-key eval-opts]
   (let [items (subscribe [:get-console-items console-key])
@@ -43,7 +45,7 @@
         [:div.re-console-container
          {:on-click #(dispatch [:focus-console-editor console-key])}
          [:div.re-console
-          [console-items console-key @items]
+          [console-items console-key @items (:to-str-fn eval-opts)]
           [editor/console-editor console-key text]]])
       :component-did-update
       (fn [this]

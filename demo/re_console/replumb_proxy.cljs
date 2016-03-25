@@ -5,7 +5,7 @@
 
 (defn replumb-options
   [verbose? src-paths]
-  (merge (replumb/browser-options src-paths io/fetch-file!)
+  (merge (replumb/options :browser src-paths io/fetch-file!)
          {:warning-as-error true
           :verbose verbose?}))
 
@@ -13,7 +13,7 @@
   (let [ns (replumb-repl/current-ns)]
     (replumb/read-eval-call opts
                             #(cb {:success? (replumb/success? %)
-                                  :result   (replumb/unwrap-result %)
+                                  :result   %
                                   :prev-ns  ns
                                   :source   source})
                             source)))
@@ -21,7 +21,7 @@
 (defn multiline?
   [input]
   (try
-    (replumb-repl/repl-read-string input)
+    (replumb-repl/read-string {} input)
     false
     (catch :default _
       true)))
@@ -30,5 +30,6 @@
   [verbose src-path]
   {:get-prompt  replumb/get-prompt
    :should-eval (complement multiline?)
+   :to-str-fn   (partial replumb/result->string false true)
    :evaluate    (partial read-eval-call
                          (replumb-options verbose src-path))})

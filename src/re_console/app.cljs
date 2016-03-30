@@ -5,7 +5,10 @@
                             :queued-forms []
                             :history [""]
                             :cm-instance nil
-                            :eval-opts {}})
+                            :eval-opts {}
+                            :mode :none
+                            ;; parinfer technical details
+                            :frame-updated? false})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;           Getters           ;;;
@@ -22,6 +25,14 @@
 (defn console-items
   [db k]
   (get-in db [:consoles (name k) :items]))
+
+(defn console-mode
+  [db k]
+  (get-in db [:consoles (name k) :mode]))
+
+(defn console-frame-updated
+  [db k]
+  (get-in db [:consoles (name k) :frame-updated?]))
 
 (defn console-history
   [db k]
@@ -54,6 +65,12 @@
 (defn set-console-eval-opts
   [db k eval-opts]
   (assoc-in db [:consoles (name k) :eval-opts] eval-opts))
+
+(defn set-console-mode [db console-key mode]
+  (assoc-in db [:consoles (name console-key) :mode] mode))
+
+(defn set-console-frame-updated [db console-key value]
+  (assoc-in db [:consoles (name console-key) :frame-updated?] value))
 
 (defn clear-console-items
   [db k]

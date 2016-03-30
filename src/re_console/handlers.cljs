@@ -103,4 +103,14 @@
  (fn set-console-eval-opts [db [_  console-key eval-opts]]
    (app/set-console-eval-opts db console-key eval-opts)))
 
+(register-handler
+ :set-console-mode
+ (fn set-console-mode [db [_  console-key mode]]
+   (app/set-console-mode db console-key mode)))
+
+(register-handler
+ :set-console-frame-updated
+ (fn set-console-frame-updated [db [_  console-key value]]
+   (app/set-console-frame-updated db console-key value)))
+
 ;; )

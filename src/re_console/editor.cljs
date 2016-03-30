@@ -1,23 +1,26 @@
 (ns re-console.editor
   (:require [reagent.core :as reagent]
-            [re-frame.core :refer [dispatch subscribe]]
+            [re-frame.core :refer [dispatch subscribe dispatch-sync]]
             [re-console.common :as common]
+            [re-console.parinfer :as parinfer]
             [cljsjs.codemirror]
             [cljsjs.codemirror.addon.edit.matchbrackets]
             [cljsjs.codemirror.addon.runmode.runmode]
             [cljsjs.codemirror.addon.runmode.colorize]
-            [cljsjs.codemirror.mode.clojure]))
+            [cljsjs.codemirror.mode.clojure]
+            [parinfer.codemirror.mode.clojure.clojure-parinfer]))
 
 (defn default-cm-options
-  [initial-prompt]
+  [initial-prompt mode]
   {:lineNumbers false
    :viewportMargin js/Infinity
+   :showCursorWhenSelecting true
    :lineWrapping true
    :matchBrackets true
    :autofocus true
    :extraKeys #js {"Shift-Enter" "newlineAndIndent"}
    :value initial-prompt
-   :mode "clojure"})
+   :mode (if (= mode :none) "clojure" "clojure-parinfer")})
 
 (def default-cm-handlers
   {:should-go-up
@@ -63,22 +66,23 @@
           box (.-parentElement re-console)]
       (common/scroll-to-el-bottom! box))))
 
-(defn on-change [inst text {:keys [set-text]}]
+(defn on-change [inst text {:keys [set-text]} mode]
   (fn []
-    (let [value (common/source-without-prompt (.getValue inst))]
-      (when-not (= value @text)
-        (set-text  value)))))
+    (when (= :none @mode)
+      (let [value (common/source-without-prompt (.getValue inst))]
+        (when-not (= value @text)
+          (set-text value))))))
 
 (defn on-keydown [console-key
-               {:keys [should-go-up should-go-down go-up go-down]}
-               eval-opts]
+                  {:keys [should-go-up should-go-down go-up go-down]}
+                  eval-opts]
   (fn [inst evt]
     (if (modifying-prompt? inst (.-keyCode evt))
       (.preventDefault evt)
       (case (.-keyCode evt)
         ;; enter
         13 (let [source (common/source-without-prompt (.getValue inst))]
-             (when ((:should-eval @eval-opts) source inst evt)
+             (when (and (not (.-shiftKey evt)) ((:should-eval @eval-opts) source))
                (.preventDefault evt)
                ((:evaluate @eval-opts) #(dispatch [:on-eval-complete console-key %]) source)))
         ;; up
@@ -99,19 +103,21 @@
   [console-key text]
   (let [cm (subscribe [:get-console console-key])
         handlers  (merge (handlers console-key) default-cm-handlers)
-        eval-opts (subscribe [:get-console-eval-opts console-key])]
+        eval-opts (subscribe [:get-console-eval-opts console-key])
+        mode (subscribe [:get-console-mode console-key])]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
         (let [el (reagent/dom-node this)
               inst (js/CodeMirror.
                     el
-                    (clj->js (default-cm-options (str ((:get-prompt @eval-opts)) @text))))]
-          (dispatch [:add-console-instance console-key inst])
+                    (clj->js (default-cm-options (str ((:get-prompt @eval-opts)) @text) @mode)))]
+          (dispatch-sync [:add-console-instance console-key inst])
           (move-to-end inst)
           (.on inst "viewportChange" (on-viewport-change this))
-          (.on inst "change" (on-change inst text handlers))
-          (.on inst "keydown" (on-keydown console-key handlers eval-opts))))
+          (.on inst "change" (on-change inst text handlers mode))
+          (.on inst "keydown" (on-keydown console-key handlers eval-opts))
+          (parinfer/parinferize! inst console-key)))
 
       :component-did-update
       (fn [this old-argv]

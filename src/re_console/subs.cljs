@@ -20,6 +20,16 @@
    (reaction (app/console-items @db console-key))))
 
 (register-sub
+ :get-console-mode
+ (fn [db [_ console-key]]
+   (reaction (app/console-mode @db console-key))))
+
+(register-sub
+ :get-console-frame-updated
+ (fn [db [_ console-key]]
+   (reaction (app/console-frame-updated @db console-key))))
+
+(register-sub
  :get-console-current-text
  (fn [db [_ console-key]]
    (let [idx (reaction (get-in @db [:consoles (name console-key) :hist-pos]))

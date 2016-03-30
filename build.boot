@@ -18,7 +18,8 @@
                  [reagent                     "0.5.0"]
                  [re-frame                    "0.5.0"]
                  [replumb/replumb             "0.2.1"]
-                 [cljsjs/codemirror           "5.10.0-0"]])
+                 [cljsjs/codemirror           "5.10.0-0"]
+                 [parinfer                    "0.2.3"]])
 
 (require
   '[adzerk.boot-cljs             :refer [cljs]]
@@ -65,6 +66,10 @@
   (comp (watch)
         (test)))
 
+(def foreign-libs
+  [{:file "html/js/clojure-parinfer.js"
+    :provides ["parinfer.codemirror.mode.clojure.clojure-parinfer"]}])
+
 (deftask dev []
   (comp (version-file)
         (serve)
@@ -75,10 +80,12 @@
         (sass)
         (cljs :optimizations :none
               :source-map true
-              :compiler-options {:source-map-timestamp true})))
+              :compiler-options {:source-map-timestamp true
+                                 :foreign-libs foreign-libs})))
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
   (comp (version-file)
         (sass)
-        (cljs :optimizations :advanced)))
+        (cljs :optimizations :advanced
+              :compiler-options {:foreign-libs foreign-libs})))

@@ -14,7 +14,8 @@
   ([console-key value]
    (display-console-output-item console-key value false))
   ([console-key value error?]
-   (let [html-value (-> value (clojure.string/replace \newline "<br/>"))]
+   (let [html-value (when value
+                      (-> value (clojure.string/replace \newline "<br/>")))]
      [:div
       {:on-click #(dispatch [:focus-console-editor console-key])
        :class (str "re-console-item" (when error? " re-console-item-error"))}

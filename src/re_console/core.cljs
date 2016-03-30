@@ -14,13 +14,10 @@
   ([console-key value]
    (display-console-output-item console-key value false))
   ([console-key value error?]
-   (let [html-value (if (nil? value)
-                      "nil"
-                      (-> value (clojure.string/replace \newline "<br/>")))]
-     [:div
-      {:on-click #(dispatch [:focus-console-editor console-key])
-       :class (str "re-console-item" (when error? " re-console-item-error"))}
-      [:div {:dangerouslySetInnerHTML {:__html html-value}}]])))
+   [:div
+    {:on-click #(dispatch [:focus-console-editor console-key])
+     :class (str "re-console-item" (when error? " re-console-item-error"))}
+    [:div [:pre {:style {:margin 0 :padding 0}} value]]]))
 
 (defn display-console-item
   [console-key to-str-fn item]

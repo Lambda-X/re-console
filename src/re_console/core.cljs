@@ -15,9 +15,10 @@
    (display-console-output-item console-key value false))
   ([console-key value error?]
    [:div
-    {:on-click #(dispatch [:focus-console-editor console-key])
-     :class (str "re-console-item" (when error? " re-console-item-error"))}
-    [:div [:pre {:style {:margin 0 :padding 0}} value]]]))
+    {:on-click #(dispatch [:focus-console-editor console-key])}
+    [:div [:pre {:style {:margin 0 :padding 0}
+                 :class (str "re-console-item" (when error? " re-console-item-error"))}
+           value]]]))
 
 (defn display-console-item
   [console-key to-str-fn item]

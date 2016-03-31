@@ -34,6 +34,10 @@ $font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
     font-family: $font-family;
     font-size: $font-size;
     opacity: 0.7;
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0px;
 }
 
 .re-console-item-error {

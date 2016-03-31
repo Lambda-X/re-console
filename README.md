@@ -70,6 +70,18 @@ correctly. Be sure to add it to your application. A template is found in
 It's a `scss` file but it's easily convertible to CSS manually or via
 [boot](https://github.com/ScalaConsultants/re-console/blob/master/build.boot#L59).
 
+## Parinfer
+
+In order to take advantage of [parinfer](https://shaunlebron.github.io/parinfer/)
+you need to do two things:
+
+* include the appropriate JavaScript file in the the compilation set. To do this
+add the [:foreign-libs](https://github.com/Lambda-X/re-console/blob/master/build.boot#L69)
+value.
+
+* Switch to parinfer by invokating the `:set-console-mode` handler, passing as
+value `:indent-mode`. To disable parinfer, call the same handler with value `:none`.
+
 # Community
 
 Many thanks to jaredly's

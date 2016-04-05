@@ -69,15 +69,15 @@
 (defn on-change [inst console-key text {:keys [set-text]} mode]
   (let [on-after-change (subscribe [:get-console-on-after-change console-key])
         on-before-change (subscribe [:get-console-on-before-change console-key])]
-    (fn []
+    (fn [inst evt]
       (when (= :none @mode)
         (let [value (common/source-without-prompt (.getValue inst))]
           (when-not (= value @text)
             (when @on-before-change
-              ( @on-before-change))
+              ( @on-before-change inst evt))
             (set-text value)
             (when @on-after-change
-              (@on-after-change))))))))
+              (@on-after-change inst evt))))))))
 
 (defn on-keydown [console-key
                   {:keys [should-go-up should-go-down go-up go-down]}

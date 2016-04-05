@@ -150,16 +150,16 @@
         mode (subscribe [:get-console-mode console-key])
         on-before-change (subscribe [:get-console-on-before-change console-key])
         on-after-change (subscribe [:get-console-on-after-change console-key])]
-    (fn [_ change]
+    (fn [inst change]
       (when-not (= :none @mode)
         (when (not= "setValue" (.-origin change))
           (when @on-before-change
-            (@on-before-change))
+            (@on-before-change inst change))
           (fix-text! :change change)
           (update-cursor! change)
           (dispatch-sync [:set-console-frame-updated console-key true])
           (when @on-after-change
-              (@on-after-change)))))))
+              (@on-after-change inst change)))))))
 
 (defn on-cursor-activity
   "Called after the cursor moves in the editor."
@@ -169,14 +169,14 @@
         mode (subscribe [:get-console-mode console-key])
         on-before-change (subscribe [:get-console-on-before-change console-key])
         on-after-change (subscribe [:get-console-on-after-change console-key])]
-    (fn []
+    (fn [inst evt]
       (when-not (= :none @mode)
         (when-not @frame-updated?
           (when @on-before-change
-            (@on-before-change))
+            (@on-before-change inst evt))
           (fix-text!)
           (when @on-after-change
-            (@on-after-change)))
+            (@on-after-change inst evt)))
         (dispatch-sync [:set-console-frame-updated console-key false])))))
 
 (defn parinferize!

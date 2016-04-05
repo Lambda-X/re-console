@@ -113,4 +113,14 @@
  (fn set-console-frame-updated [db [_  console-key value]]
    (app/set-console-frame-updated db console-key value)))
 
+(register-handler
+ :set-console-on-before-change
+ (fn set-console-on-before-change [db [_  console-key on-before-change]]
+   (app/set-console-on-before-change db console-key on-before-change)))
+
+(register-handler
+ :set-console-on-after-change
+ (fn set-console-on-after-change [db [_  console-key on-after-change]]
+   (app/set-console-on-after-change db console-key on-after-change)))
+
 ;; )

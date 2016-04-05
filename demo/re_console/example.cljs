@@ -41,7 +41,9 @@
 (defn ^:export main []
   (enable-console-print!)
   (dispatch [:init-options])
-  (reagent/render [console/console console-key (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+  (reagent/render [console/console console-key {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])
+                                                :on-before-change #(println "Before change.")
+                                                :on-after-change #(println "After change.")}]
                   (.getElementById js/document "app"))
   (reagent/render [toggle-verbose]
                   (.getElementById js/document "verbose"))

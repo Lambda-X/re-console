@@ -8,7 +8,9 @@
                             :eval-opts {}
                             :mode :none
                             ;; parinfer technical details
-                            :frame-updated? false})
+                            :frame-updated? false
+                            :on-before-change nil
+                            :on-after-change nil})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;           Getters           ;;;
@@ -55,8 +57,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn init-console
-  [db k eval-opts]
-  (assoc-in db [:consoles (name k)] (assoc initial-console-state :eval-opts eval-opts)))
+  [db k initial-user-state]
+  (assoc-in db [:consoles (name k)] (merge initial-console-state initial-user-state)))
 
 (defn add-console-instance
   [db k instance]
@@ -187,3 +189,19 @@
       (add-console-input k source prev-ns)
       (add-console-result k (not success?) result)
       (set-next-queued-form-if-any k)))
+
+(defn set-console-on-before-change
+  [db k on-before-change]
+  (assoc-in db [:consoles (name k) :on-before-change] on-before-change))
+
+(defn set-console-on-after-change
+  [db k on-after-change]
+  (assoc-in db [:consoles (name k) :on-after-change] on-after-change))
+
+(defn console-on-before-change
+  [db k]
+  (get-in db [:consoles (name k) :on-before-change]))
+
+(defn console-on-after-change
+  [db k]
+  (get-in db [:consoles (name k) :on-after-change]))

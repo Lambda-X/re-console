@@ -36,17 +36,17 @@
   ([console-key items to-str-fn]
    (into [:div] (map (partial display-console-item console-key to-str-fn) items))))
 
-(defn console [console-key eval-opts]
+(defn console [console-key opts]
   (let [items (subscribe [:get-console-items console-key])
         text  (subscribe [:get-console-current-text console-key])]
-    (dispatch-sync [:init-console console-key eval-opts])
+    (dispatch-sync [:init-console console-key opts])
     (reagent/create-class
      {:reagent-render
       (fn []
         [:div.re-console-container
          {:on-click #(dispatch [:focus-console-editor console-key])}
          [:div.re-console
-          [console-items console-key @items (:to-str-fn eval-opts)]
+          [console-items console-key @items (-> opts :eval-opts :to-str-fn)]
           [editor/console-editor console-key text]]])
       :component-did-update
       (fn [this]

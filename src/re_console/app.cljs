@@ -93,9 +93,32 @@
 (defn set-console-frame-updated [db console-key value]
   (assoc-in db [:consoles (name console-key) :frame-updated?] value))
 
+(defn update-console-history
+  [db k idx pos text]
+  (update-in db [:consoles (name k) :history]
+             (fn [current-history]
+               (if (= pos 0)
+                 (assoc current-history idx text)
+                 (conj current-history text)))))
+
+(defn set-console-history-position
+  [db k new-pos]
+  (assoc-in db [:consoles (name k) :hist-pos] new-pos))
+
+(defn set-console-text
+  [db k text]
+  (let [history (console-history db k)
+        pos (console-history-pos db k)
+        idx (- (count history) pos 1)]
+    (-> db
+        (set-console-history-position k 0)
+        (update-console-history k idx pos text))))
+
 (defn clear-console-items
   [db k]
-  (assoc-in db [:consoles (name k) :items] []))
+  (-> db
+      (assoc-in [:consoles (name k) :items] [])
+      (set-console-text k "")))
 
 (defn reset-console-items
   [db k]
@@ -112,10 +135,6 @@
 (defn add-console-items
   [db k items]
   (update-in db [:consoles (name k) :items] concat items))
-
-(defn set-console-history-position
-  [db k new-pos]
-  (assoc-in db [:consoles (name k) :hist-pos] new-pos))
 
 (defn add-console-history-item
   [db k item]
@@ -146,23 +165,6 @@
   (update-in db [:consoles (name k) :items] conj {:type :log
                                                   :value item}))
 
-(defn update-console-history
-  [db k idx pos text]
-  (update-in db [:consoles (name k) :history]
-             (fn [current-history]
-               (if (= pos 0)
-                 (assoc current-history idx text)
-                 (conj current-history text)))))
-
-(defn set-console-text
-  [db k text]
-  (let [history (console-history db k)
-        pos (console-history-pos db k)
-        idx (- (count history) pos 1)]
-    (-> db
-        (set-console-history-position k 0)
-        (update-console-history k idx pos text))))
-
 (defn console-go-up
   [db k]
   (let [pos (console-history-pos db k)
@@ -181,7 +183,9 @@
 
 (defn clear-console-queued-forms
   [db k]
-  (assoc-in db [:consoles (name k) :queued-forms] []))
+  (-> db
+      (assoc-in [:consoles (name k) :queued-forms] [])
+      (set-console-text k "")))
 
 (defn set-console-queued-forms
   [db k forms]

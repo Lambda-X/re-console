@@ -91,6 +91,7 @@
 (register-handler
  :clear-console-queued-forms
  (fn clear-console-queued-forms [db [_ console-key]]
+   (dispatch [:focus-console-editor console-key])
    (app/clear-console-queued-forms db console-key)))
 
 (register-handler
@@ -106,6 +107,7 @@
 (register-handler
  :set-console-mode
  (fn set-console-mode [db [_  console-key mode]]
+   (dispatch [:focus-console-editor console-key])
    (app/set-console-mode db console-key mode)))
 
 (register-handler

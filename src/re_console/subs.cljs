@@ -63,4 +63,9 @@
  (fn [db [_ console-key]]
    (reaction (app/console-on-after-change @db console-key))))
 
+(register-sub
+ :get-console-full-text
+ (fn [db [_ console-key]]
+   (reaction (app/console-full-text @db console-key))))
+
 ;; )

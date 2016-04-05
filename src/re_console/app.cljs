@@ -52,6 +52,25 @@
   [db k]
   (get-in db [:consoles (name k) :eval-opts]))
 
+(defn console-full-text
+  [db k]
+  (let [items (console-items db k)
+        to-str-fn (:to-str-fn (console-eval-opts db k))]
+    (apply str (interpose \newline (map (fn [item]
+                                          (println item)
+                                          (if-let [text (:text item)]
+                                            (str (:ns item) "=> " text)
+                                            (to-str-fn (:value item))))
+                                        items)))))
+
+(defn console-on-before-change
+  [db k]
+  (get-in db [:consoles (name k) :on-before-change]))
+
+(defn console-on-after-change
+  [db k]
+  (get-in db [:consoles (name k) :on-after-change]))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;       State modifiers       ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -198,10 +217,3 @@
   [db k on-after-change]
   (assoc-in db [:consoles (name k) :on-after-change] on-after-change))
 
-(defn console-on-before-change
-  [db k]
-  (get-in db [:consoles (name k) :on-before-change]))
-
-(defn console-on-after-change
-  [db k]
-  (get-in db [:consoles (name k) :on-after-change]))

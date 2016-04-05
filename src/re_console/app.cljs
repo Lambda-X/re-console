@@ -99,7 +99,7 @@
              (fn [current-history]
                (if (= pos 0)
                  (assoc current-history idx text)
-                 (conj current-history text)))))
+                 (filterv seq (conj current-history text))))))
 
 (defn set-console-history-position
   [db k new-pos]
@@ -131,7 +131,6 @@
   [db k item]
   (update-in db [:consoles (name k) :items] conj item))
 
-
 (defn add-console-items
   [db k items]
   (update-in db [:consoles (name k) :items] concat items))
@@ -150,10 +149,7 @@
 (defn add-console-input
   [db k input ns]
   (let [inum (count (console-history db k))]
-    (-> db
-        (set-console-history-position k 0)
-        (add-console-history-item k "")
-        (add-console-input-item k inum input ns))))
+    (add-console-input-item db k inum input ns)))
 
 (defn add-console-result
   [db k error? value]
@@ -207,11 +203,16 @@
 
 (defn on-eval-complete
   [db k {:keys [prev-ns source success? result]}]
-  (-> db
-      (set-console-text k source)
-      (add-console-input k source prev-ns)
-      (add-console-result k (not success?) result)
-      (set-next-queued-form-if-any k)))
+  (let [db (if (seq source)
+             (-> db
+                 (set-console-text k source)
+                 (set-console-history-position k 0)
+                 (add-console-history-item k ""))
+             db)]
+    (-> db
+        (add-console-input k source prev-ns)
+        (add-console-result k (not success?) result)
+        (set-next-queued-form-if-any k))))
 
 (defn set-console-on-before-change
   [db k on-before-change]

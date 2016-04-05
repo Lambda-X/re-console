@@ -53,4 +53,14 @@
  (fn [db [_ console-key]]
    (reaction (app/console-eval-opts @db console-key))))
 
+(register-sub
+ :get-console-on-before-change
+ (fn [db [_ console-key]]
+   (reaction (app/console-on-before-change @db console-key))))
+
+(register-sub
+ :get-console-on-after-change
+ (fn [db [_ console-key]]
+   (reaction (app/console-on-after-change @db console-key))))
+
 ;; )

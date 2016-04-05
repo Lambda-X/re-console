@@ -1,7 +1,7 @@
 (ns re-console.parinfer
   "Glues Parinfer's formatter to a CodeMirror editor"
   (:require [clojure.string :refer [join]]
-            [re-frame.core :refer [subscribe dispatch]]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [parinfer.indent-mode :as indent-mode]
             [parinfer.paren-mode :as paren-mode]
             [re-console.common :as common]))
@@ -147,25 +147,37 @@
   [console-key]
   (let [fix-text! (fix-text-fn console-key)
         update-cursor! (update-cursor-fn console-key)
-        mode (subscribe [:get-console-mode console-key])]
+        mode (subscribe [:get-console-mode console-key])
+        on-before-change (subscribe [:get-console-on-before-change console-key])
+        on-after-change (subscribe [:get-console-on-after-change console-key])]
     (fn [_ change]
       (when-not (= :none @mode)
         (when (not= "setValue" (.-origin change))
+          (when @on-before-change
+            (@on-before-change))
           (fix-text! :change change)
           (update-cursor! change)
-          (dispatch [:set-console-frame-updated console-key true]))))))
+          (dispatch-sync [:set-console-frame-updated console-key true])
+          (when @on-after-change
+              (@on-after-change)))))))
 
 (defn on-cursor-activity
   "Called after the cursor moves in the editor."
   [console-key]
   (let [frame-updated? (subscribe [:get-console-frame-updated console-key])
         fix-text! (fix-text-fn console-key)
-        mode (subscribe [:get-console-mode console-key])]
+        mode (subscribe [:get-console-mode console-key])
+        on-before-change (subscribe [:get-console-on-before-change console-key])
+        on-after-change (subscribe [:get-console-on-after-change console-key])]
     (fn []
       (when-not (= :none @mode)
         (when-not @frame-updated?
-          (fix-text!))
-        (dispatch [:set-console-frame-updated console-key false])))))
+          (when @on-before-change
+            (@on-before-change))
+          (fix-text!)
+          (when @on-after-change
+            (@on-after-change)))
+        (dispatch-sync [:set-console-frame-updated console-key false])))))
 
 (defn parinferize!
   "Add parinfer goodness to a codemirror editor"

@@ -66,12 +66,18 @@
           box (.-parentElement re-console)]
       (common/scroll-to-el-bottom! box))))
 
-(defn on-change [inst text {:keys [set-text]} mode]
-  (fn []
-    (when (= :none @mode)
-      (let [value (common/source-without-prompt (.getValue inst))]
-        (when-not (= value @text)
-          (set-text value))))))
+(defn on-change [inst console-key text {:keys [set-text]} mode]
+  (let [on-after-change (subscribe [:get-console-on-after-change console-key])
+        on-before-change (subscribe [:get-console-on-before-change console-key])]
+    (fn []
+      (when (= :none @mode)
+        (let [value (common/source-without-prompt (.getValue inst))]
+          (when-not (= value @text)
+            (when @on-before-change
+              ( @on-before-change))
+            (set-text value)
+            (when @on-after-change
+              (@on-after-change))))))))
 
 (defn on-keydown [console-key
                   {:keys [should-go-up should-go-down go-up go-down]}
@@ -104,7 +110,8 @@
   (let [cm (subscribe [:get-console console-key])
         handlers  (merge (handlers console-key) default-cm-handlers)
         eval-opts (subscribe [:get-console-eval-opts console-key])
-        mode (subscribe [:get-console-mode console-key])]
+        mode (subscribe [:get-console-mode console-key])
+        on-before-change (subscribe [:get-console-on-before-change console-key])]
     (reagent/create-class
      {:component-did-mount
       (fn [this]
@@ -115,10 +122,9 @@
           (dispatch-sync [:add-console-instance console-key inst])
           (move-to-end inst)
           (.on inst "viewportChange" (on-viewport-change this))
-          (.on inst "change" (on-change inst text handlers mode))
+          (.on inst "change" (on-change inst console-key text handlers mode))
           (.on inst "keydown" (on-keydown console-key handlers eval-opts))
           (parinfer/parinferize! inst console-key)))
-
       :component-did-update
       (fn [this old-argv]
         (when-not (= @text (common/source-without-prompt (.getValue @cm)))

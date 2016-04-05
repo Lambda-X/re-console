@@ -38,6 +38,11 @@ $font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
     border: none;
     margin: 0;
     padding: 0px;
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;
 }
 
 .re-console-item-error {

@@ -183,5 +183,4 @@
   "Add parinfer goodness to a codemirror editor"
   [cm console-key]
   (.on cm "change" (on-change console-key))
-  (.on cm "beforeChange" before-change)
-  (.on cm "cursorActivity" (on-cursor-activity console-key)))
+  (.on cm "beforeChange" before-change))

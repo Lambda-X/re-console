@@ -57,7 +57,6 @@
   (let [items (console-items db k)
         to-str-fn (:to-str-fn (console-eval-opts db k))]
     (apply str (interpose \newline (map (fn [item]
-                                          (println item)
                                           (if-let [text (:text item)]
                                             (str (:ns item) "=> " text)
                                             (to-str-fn (:value item))))

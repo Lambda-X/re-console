@@ -5,7 +5,7 @@ re-console is an interactive terminal-like REPL. It is implemented using a
 [CodeMirror](https://codemirror.net/)
 component for user input and
 [re-frame](https://github.com/Day8/re-frame) for state management. It
-proviedes a user-friendly interface which allows to easily embed it in a web page
+provides a user-friendly interface which allows to easily embed it in a web page
 and integrate it with an evaluation library (e.g.
 [replumb](https://github.com/Lambda-X/replumb)).
 
@@ -26,23 +26,26 @@ Using re-console is as simple as rendering the `console` component, which
 accepts two parameters: a unique key and a map of options.
 
 ```
-(reagent/render [console/console :cnsl-1 (replumb-proxy/eval-opts false ["/js/compiled/out"])]
+(reagent/render [console/console :key
+                                 {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])}]
                   (.getElementById js/document "app"))
 ```
 
 The unique key is used to identify the console and the map of options
 should contain the following keys:
 
-* `:get-prompt`: a zero-arity function, returns a string (the prompt
-displayed after each evaluation).
-* `:should-eval`: a predicate function that takes the source as input (the
-expression to evaluate) and returns true or false depending on whether
-it can be evaluated. If `false`, the cursor will be placed on a new line.
-* `to-str-fn`: a one-arity function that converts the result to a string.
-If the result is already a string simply use `identity`.
-* `evaluate`: the main evaluation function, takes as arguments a callback
-function (called after evaluation) and the source to evaluate.
-Will be called if `should-eval` returns `true`.
+* `:eval-opts`: a map of evaluation options, which in turn contains:
+
+  * `:get-prompt`: a zero-arity function, returns a string (the prompt
+  displayed after each evaluation).
+  * `:should-eval`: a predicate function that takes the source as input (the
+  expression to evaluate) and returns true or false depending on whether
+  it can be evaluated. If `false`, the cursor will be placed on a new line.
+  * `to-str-fn`: a one-arity function that converts the result to a string.
+  If the result is already a string simply use `identity`.
+  * `evaluate`: the main evaluation function, takes as arguments a callback
+  function (called after evaluation) and the source to evaluate.
+  Will be called if `should-eval` returns `true`.
 
 The callback function will be called with a map as parameter containing the
 following keys:
@@ -85,8 +88,10 @@ value `:indent-mode`. To disable parinfer, call the same handler with value `:no
 # Community
 
 Many thanks to jaredly's
-[reepl](https://github.com/jaredly/reepl) and amasad's
-[jq-console](https://github.com/replit/jq-console) for inspiration.
+[reepl](https://github.com/jaredly/reepl), amasad's
+[jq-console](https://github.com/replit/jq-console) and hiram-madelaine's
+[codemirror-parinfer](https://github.com/hiram-madelaine/codemirror-parinfer)
+for inspiration.
 
 # License
 

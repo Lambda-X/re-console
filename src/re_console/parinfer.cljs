@@ -90,7 +90,7 @@
         prev-state (atom nil)]
     (fn [& {:keys [change use-cache?]
             :or {change nil, use-cache? false}}]
-      (let [current-text (common/source-without-prompt (.getValue @cm))
+      (let [current-text (.getValue @cm)
             selection? (.somethingSelected @cm)
             selections (.listSelections @cm)
             cursor (.getCursor @cm)
@@ -117,8 +117,8 @@
                          (:text result))
                        nil)]
 
-        (dispatch [:console-set-text console-key new-text])
-        (.setValue @cm (str ((:get-prompt @eval-opts)) new-text))
+        (dispatch [:console-set-text console-key (common/source-without-prompt new-text)])
+        (.setValue @cm (str ((:get-prompt @eval-opts)) (common/source-without-prompt new-text)))
 
         ;; restore the selection, cursor, and scroll
         ;; since these are reset when overwriting codemirror's value.

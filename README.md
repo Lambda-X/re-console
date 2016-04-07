@@ -1,5 +1,7 @@
 # re-console
 
+[![Clojars Project](https://img.shields.io/clojars/v/re-console.svg)](https://clojars.org/re-console)
+
 ## Overview
 re-console is an interactive terminal-like REPL. It is implemented using a
 [CodeMirror](https://codemirror.net/)
@@ -58,7 +60,7 @@ error
 
 The whole state is kept under the `:consoles` keyword in the global state and
 you can nicely interact with it via re-frame
-[handlers](https://github.com/ScalaConsultants/re-console/blob/master/src/re_console/handlers.cljs)
+[handlers](https://github.com/Lambda-X/re-console/blob/0.1.2/src/re_console/handlers.cljs)
 (for example for changing the evaluation options or clearing the history).
 
 ## Tests
@@ -69,9 +71,9 @@ Run `boot test` or `boot auto-test`.
 
 The re-console component needs a custom CSS file in order to be displayed
 correctly. Be sure to add it to your application. A template is found in
-[the demo](https://github.com/ScalaConsultants/re-console/blob/master/html/css/re-console.scss).
+[the demo](https://github.com/Lambda-X/re-console/blob/0.1.2/html/css/re-console.scss)
 It's a `scss` file but it's easily convertible to CSS manually or via
-[boot](https://github.com/ScalaConsultants/re-console/blob/master/build.boot#L59).
+[boot](https://github.com/Lambda-X/re-console/blob/0.1.2/build.boot#L80).
 
 ## Parinfer
 
@@ -79,7 +81,7 @@ In order to take advantage of [parinfer](https://shaunlebron.github.io/parinfer/
 you need to do two things:
 
 * include the appropriate JavaScript file in the the compilation set. To do this
-add the [:foreign-libs](https://github.com/Lambda-X/re-console/blob/master/build.boot#L69)
+add the [:foreign-libs](https://github.com/Lambda-X/re-console/blob/0.1.2/build.boot#L69)
 value.
 
 * Switch to parinfer by invokating the `:set-console-mode` handler, passing as

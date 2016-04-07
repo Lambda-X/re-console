@@ -51,13 +51,19 @@
 
 (defn modifying-prompt?
   [inst key]
-  (let [pos (.getCursor inst)
-        lno (.-line pos)
-        cno (.-ch pos)
-        compare-position-fn (if (= 8 key) <= <)]
+  (let [pos-to (.getCursor inst "to")
+        pos-from (.getCursor inst "from")
+        lno (.-line pos-to)
+        cno-to (.-ch pos-to)
+        cno-from (.-ch pos-from)
+        compare-position-fn (if (= 8 key) <= <)
+        begin-source (common/beginning-of-source (.getValue inst))
+        same-pos (= pos-to pos-from)]
     (and ((complement #{37 38 39 40}) key)
          (zero? lno)
-         (compare-position-fn cno (common/beginning-of-source (.getValue inst))))))
+         (or (compare-position-fn cno-to begin-source)
+             (and (not same-pos)
+                  (compare-position-fn cno-from (dec begin-source)))))))
 
 (defn on-viewport-change [this]
   (fn []

@@ -24,7 +24,7 @@
     (replumb-repl/read-string {} input)
     false
     (catch :default _
-      true)))
+      (= "EOF" (subs (.-message e) 0 3)))))
 
 (defn eval-opts
   [verbose src-path]

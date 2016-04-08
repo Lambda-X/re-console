@@ -44,6 +44,11 @@
    (reaction (app/console @db console-key))))
 
 (register-sub
+ :queued-forms-count
+ (fn [db [_ console-key]]
+   (reaction (count (app/queued-forms @db console-key)))))
+
+(register-sub
  :queued-forms-empty?
  (fn [db [_ console-key]]
    (reaction (not (empty? (app/queued-forms @db console-key))))))

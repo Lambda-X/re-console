@@ -36,6 +36,14 @@
   ([console-key items to-str-fn]
    (into [:div] (map (partial display-console-item console-key to-str-fn) items))))
 
+(defn status-bar
+  [console-key]
+  (let [mode (subscribe [:get-console-mode console-key])
+        queued-forms-count (subscribe [:queued-forms-count console-key])]
+    [:div.re-console-status
+     (str "Current mode: " (name @mode) " | "
+          @queued-forms-count " form(s) in the evaluation queue")]))
+
 (defn console [console-key opts]
   (let [items (subscribe [:get-console-items console-key])
         text  (subscribe [:get-console-current-text console-key])]
@@ -43,11 +51,13 @@
     (reagent/create-class
      {:reagent-render
       (fn []
-        [:div.re-console-container
-         {:on-click #(dispatch [:focus-console-editor console-key])}
-         [:div.re-console
-          [console-items console-key @items (-> opts :eval-opts :to-str-fn)]
-          [editor/console-editor console-key text]]])
+        [:div
+         [:div.re-console-container
+          {:on-click #(dispatch [:focus-console-editor console-key])}
+          [:div.re-console
+           [console-items console-key @items (-> opts :eval-opts :to-str-fn)]
+           [editor/console-editor console-key text]]]
+         [status-bar console-key]])
       :component-did-update
       (fn [this]
-        (common/scroll-to-el-bottom! (reagent/dom-node this)))})))
+        (common/scroll-to-el-bottom! (.-firstChild (reagent/dom-node this))))})))

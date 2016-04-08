@@ -4,13 +4,31 @@ body { -webkit-animation: androidBugfix infinite 1s; }
 /* end workaround */
 
 body, html {
-    background-color: #9BBABB;
+    background-color: #E0E0E0;
 }
 
 .buttons-container {
     padding: 10px;
 }
 
-.buttons-element {
+.button-element {
     margin-right: 5px;
+    color: #fff !important;
+    word-spacing: 0.25em;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    border: none;
+    line-height: 22px;
+    padding: 12px 13px 11px;
+    text-align: center;
+    display: inline-block;
+    margin-top: 5px;
+    margin-bottom: 18px;
+    text-decoration: none;
 }
+
+#main {
+    width: 80%;
+    margin: 40px auto 0;
+}
+

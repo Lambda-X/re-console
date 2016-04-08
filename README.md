@@ -20,7 +20,7 @@ It uses `replumb` as evaluation library.
 To start the demo run `boot dev` and browse to
 [localhost:3000](http://localhost:3000).
 
-![screenshot](screenshot.png)
+![screenshot](screenshot.gif)
 
 ## Usage
 
@@ -29,13 +29,16 @@ accepts two parameters: a unique key and a map of options.
 
 ```
 (reagent/render [console/console :key
-                                 {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])}]
+                                 {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])
+                                  :mode-line? true}]
                   (.getElementById js/document "app"))
 ```
 
 The unique key is used to identify the console and the map of options
 should contain the following keys:
 
+* `:mode-line?`: if `true`, an Emacs-like modeline will be displayed under the
+console.
 * `:eval-opts`: a map of evaluation options, which in turn contains:
 
   * `:get-prompt`: a zero-arity function, returns a string (the prompt

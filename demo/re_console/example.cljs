@@ -16,34 +16,39 @@
 (defn toggle-verbose []
   (let [verbose? (subscribe [:get-console-verbose])]
     (fn []
-      [:div.buttons-container
-       [:input.buttons-element
+      [:div
+       [:input.button-element
         {:type "button"
          :value "Toggle verbose"
          :on-click #(do (dispatch [:toggle-verbose])
                         (dispatch [:set-console-eval-opts console-key
-                                               (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
-       [:span.buttons-element
+                                   (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
+       [:span
         "Now is " [:strong (if (false? @verbose?) "false" "true")]]])))
 
 (defn toggle-parinfer []
   (let [mode (subscribe [:get-console-mode console-key])]
     (fn []
-      [:div.buttons-container
-       [:input.buttons-element
+      [:div
+       [:input.button-element
         {:type "button"
          :value "Toggle parinfer"
          :on-click #(let [new-mode (if (= @mode :none) :indent-mode :none)]
                       (dispatch [:set-console-mode console-key new-mode]))}]
-       [:span.buttons-element
-        "Now is " [:strong (str @mode)]]])))
+       [:span
+        "Now is " [:strong (name @mode)]]])))
+
+(defn buttons
+  []
+  [:div.buttons-container
+   [toggle-verbose]
+   [toggle-parinfer]])
 
 (defn ^:export main []
   (enable-console-print!)
   (dispatch [:init-options])
-  (reagent/render [console/console console-key {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])}]
+  (reagent/render [console/console console-key {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])
+                                                :mode-line? true}]
                   (.getElementById js/document "app"))
-  (reagent/render [toggle-verbose]
-                  (.getElementById js/document "verbose"))
-  (reagent/render [toggle-parinfer]
-                  (.getElementById js/document "parinfer")))
+  (reagent/render [buttons]
+                  (.getElementById js/document "buttons")))

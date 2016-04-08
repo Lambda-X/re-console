@@ -36,11 +36,11 @@
   ([console-key items to-str-fn]
    (into [:div] (map (partial display-console-item console-key to-str-fn) items))))
 
-(defn status-bar
+(defn mode-line
   [console-key]
   (let [mode (subscribe [:get-console-mode console-key])
         queued-forms-count (subscribe [:queued-forms-count console-key])]
-    [:div.re-console-status
+    [:div.re-console-mode-line
      (str "Current mode: " (name @mode) " | "
           @queued-forms-count " form(s) in the evaluation queue")]))
 
@@ -57,7 +57,8 @@
           [:div.re-console
            [console-items console-key @items (-> opts :eval-opts :to-str-fn)]
            [editor/console-editor console-key text]]]
-         [status-bar console-key]])
+         (when (:mode-line? opts)
+           [mode-line console-key])])
       :component-did-update
       (fn [this]
         (common/scroll-to-el-bottom! (.-firstChild (reagent/dom-node this))))})))

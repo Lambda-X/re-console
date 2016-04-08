@@ -32,9 +32,10 @@
 
 (defn console-items
   ([console-key items]
-   (into [:div] (map (partial display-console-item console-key identity) items)))
+   (console-items console-key items identity))
   ([console-key items to-str-fn]
-   (into [:div] (map (partial display-console-item console-key to-str-fn) items))))
+   (into [:div {:on-click #(.stopPropagation %)}]
+         (map (partial display-console-item console-key to-str-fn) items))))
 
 (defn mode-line
   [console-key]

@@ -37,6 +37,7 @@ accepts two parameters: a unique key and a map of options.
 The unique key is used to identify the console and the map of options
 should contain the following keys:
 
+* `:mode`: the input mode, one of `#{:indent-mode, :paren-mode, :none}`
 * `:mode-line?`: if `true`, an Emacs-like modeline will be displayed under the
 console.
 * `:eval-opts`: a map of evaluation options, which in turn contains:

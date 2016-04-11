@@ -23,7 +23,7 @@
   (try
     (replumb-repl/read-string {} input)
     false
-    (catch :default _
+    (catch :default e
       (= "EOF" (subs (.-message e) 0 3)))))
 
 (defn eval-opts

@@ -27,7 +27,7 @@ To start the demo run `boot dev` and browse to
 Using re-console is as simple as rendering the `console` component, which
 accepts two parameters: a unique key and a map of options.
 
-```
+```clojure
 (reagent/render [console/console :key
                                  {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])
                                   :mode-line? true}]

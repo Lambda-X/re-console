@@ -134,9 +134,18 @@
       :component-did-update
       (fn [this old-argv]
         (when-not (= @text (common/source-without-prompt (.getValue @cm)))
-          (.setValue @cm (str ((:get-prompt @eval-opts)) @text))
-          (move-to-end @cm)))
+          (let [cursor (.getCursor @cm)
+                line-idx (.-line cursor)
+                cursor-idx (.-ch cursor)]
+            (.setValue @cm (str ((:get-prompt @eval-opts)) @text))
+            (let [current-line (.getLine @cm line-idx)
+                  space-idx (.indexOf current-line \space cursor-idx)
+                  last-idx (if (= space-idx -1)
+                             (count current-line)
+                             space-idx)]
+              (.setCursor @cm line-idx last-idx)))))
       :reagent-render
       (fn []
         @text
         [:div])})))
+

@@ -138,7 +138,7 @@
                 line-idx (.-line cursor)
                 cursor-idx (.-ch cursor)]
             (.setValue @cm (str ((:get-prompt @eval-opts)) @text))
-            (let [current-line (.getLine @cm line-idx)
+            (let [current-line (.getLine @cm (min (dec (.lineCount @cm)) line-idx))
                   space-idx (.indexOf current-line \space cursor-idx)
                   last-idx (if (= space-idx -1)
                              (count current-line)

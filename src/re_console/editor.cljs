@@ -139,10 +139,14 @@
                 cursor-idx (.-ch cursor)]
             (.setValue @cm (str ((:get-prompt @eval-opts)) @text))
             (let [current-line (.getLine @cm (min (dec (.lineCount @cm)) line-idx))
-                  space-idx (.indexOf current-line \space cursor-idx)
-                  last-idx (if (= space-idx -1)
-                             (count current-line)
-                             space-idx)]
+                  last-idx (loop [exclude-chars #{\( \[ \{ \) \] \} \space}]
+                             (if (seq exclude-chars)
+                               (let [char (first exclude-chars)
+                                     char-index (.indexOf current-line char cursor-idx)]
+                                 (if (= char-index -1)
+                                   (recur (rest exclude-chars))
+                                   char-index))
+                               (count current-line)))]
               (.setCursor @cm line-idx last-idx)))))
       :reagent-render
       (fn []

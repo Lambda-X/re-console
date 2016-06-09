@@ -1,5 +1,5 @@
 (set-env!
- :resource-paths #{"html" "demo" "src"}
+ :resource-paths #{"html" "demo" "src" "sources/"}
  :dependencies '[[adzerk/boot-cljs                    "1.7.228-1"      :scope "test"]
                  [pandeiro/boot-http                  "0.7.1-SNAPSHOT" :scope "test"]
                  [adzerk/boot-reload                  "0.4.5"          :scope "test"]
@@ -13,23 +13,32 @@
                  [day8/re-frame-tracer                "0.1.0-SNAPSHOT" :scope "test"]
                  [deraen/boot-sass                    "0.2.1"          :scope "test"]
                  [adzerk/bootlaces                    "0.1.13"         :scope "test"]
+                 [replumb/boot-pack-source    "0.1.2-1"   :scope "test"]
                  [org.clojure/clojure         "1.7.0"]
                  [org.clojure/clojurescript   "1.7.228"]
                  [reagent                     "0.5.0"]
                  [re-frame                    "0.5.0"]
-                 [replumb/replumb             "0.2.1"]
+                 [replumb/replumb             "0.2.2"]
                  [cljsjs/codemirror           "5.10.0-0"]
                  [parinfer                    "0.2.3"]])
 
-(require
-  '[adzerk.boot-cljs             :refer [cljs]]
-  '[adzerk.boot-cljs-repl        :refer [cljs-repl start-repl]]
-  '[adzerk.boot-reload           :refer [reload]]
-  '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
-  '[pandeiro.boot-http           :refer [serve]]
-  '[deraen.boot-sass             :refer [sass]]
-  '[boot-semver.core             :refer :all]
-  '[adzerk.bootlaces             :refer :all])
+;;; clojurescript sources
+
+(def clojurescript-dep '[org.clojure/clojurescript "1.8.40"])
+(def pack-source-deps (conj '[[replumb/replumb             "0.2.2-SNAPSHOT"]
+                              [org.clojure/tools.reader    "1.0.0-alpha3"]]
+                            clojurescript-dep))
+
+(require '[adzerk.boot-cljs             :refer [cljs]]
+         '[adzerk.boot-cljs-repl        :refer [cljs-repl start-repl]]
+         '[adzerk.boot-reload           :refer [reload]]
+         '[crisptrutski.boot-cljs-test  :refer [test-cljs]]
+         '[pandeiro.boot-http           :refer [serve]]
+         '[deraen.boot-sass             :refer [sass]]
+         '[replumb.boot-pack-source     :refer [pack-source]]
+         '[boot-semver.core             :refer :all]
+         '[adzerk.bootlaces             :refer :all])
+
 
 (def +version+ (get-version))
 
@@ -56,6 +65,16 @@
         (add-resource (java.io.File. ".") :include #{#"^version\.properties$"})
         commit!)))
 
+(deftask add-cljs-source
+  []
+  (comp (with-pre-wrap [fs]
+          (boot.util/info "Pack source files...\n")
+          fs)
+        (pack-source :to-dir "cljs-src"
+                     :deps (into #{} pack-source-deps)
+                     :exclusions '#{org.clojure/clojure
+                                    org.mozilla/rhino})))
+
 (deftask test []
   (merge-env! :source-paths #{"test"})
   (comp (speak)
@@ -72,20 +91,21 @@
 
 (deftask dev []
   (comp (version-file)
-        (serve)
         (watch)
-        (speak)
         (cljs-repl)
         (reload :on-jsload 're-console.example/main)
         (sass)
         (cljs :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true
-                                 :foreign-libs foreign-libs})))
+                                 :foreign-libs foreign-libs})
+        (add-cljs-source)
+        (serve)))
 
 (deftask build []
   (merge-env! :source-paths #{"src" "demo"} :resource-paths #{"html"})
   (comp (version-file)
         (sass)
         (cljs :optimizations :advanced
-              :compiler-options {:foreign-libs foreign-libs})))
+              :compiler-options {:foreign-libs foreign-libs})
+        (add-cljs-source)))

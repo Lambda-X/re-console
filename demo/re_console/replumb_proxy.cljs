@@ -7,7 +7,9 @@
   [verbose? src-paths]
   (merge (replumb/options :browser src-paths io/fetch-file!)
          {:warning-as-error true
-          :verbose verbose?}))
+          :verbose verbose?
+          :init {:nss {:use #{'[init-require.test2 :only [var2 fun2]]
+                              '[clojure.set :only [union]]}}}}))
 
 (defn read-eval-call [opts cb source]
   (let [ns (replumb-repl/current-ns)]
@@ -27,9 +29,9 @@
       (= "EOF" (subs (.-message e) 0 3)))))
 
 (defn eval-opts
-  [verbose src-path]
+  [verbose src-paths]
   {:get-prompt  replumb/get-prompt
    :should-eval (complement multiline?)
    :to-str-fn   (partial replumb/result->string false true)
    :evaluate    (partial read-eval-call
-                         (replumb-options verbose src-path))})
+                         (replumb-options verbose src-paths))})

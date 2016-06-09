@@ -12,6 +12,7 @@
             [parinfer.codemirror.mode.clojure.clojure-parinfer]))
 
 (defonce console-key :cljs-console)
+(defonce src-paths ["/cljs-src" "/js/compiled/out"])
 
 (defn toggle-verbose []
   (let [verbose? (subscribe [:get-console-verbose])]
@@ -22,7 +23,7 @@
          :value "Toggle verbose"
          :on-click #(do (dispatch [:toggle-verbose])
                         (dispatch [:set-console-eval-opts console-key
-                                   (replumb-proxy/eval-opts (not @verbose?) ["/js/compiled/out"])]))}]
+                                   (replumb-proxy/eval-opts (not @verbose?) src-paths)]))}]
        [:span
         "Now is " [:strong (if (false? @verbose?) "false" "true")]]])))
 
@@ -47,7 +48,7 @@
 (defn ^:export main []
   (enable-console-print!)
   (dispatch [:init-options])
-  (reagent/render [console/console console-key {:eval-opts (replumb-proxy/eval-opts false ["/js/compiled/out"])
+  (reagent/render [console/console console-key {:eval-opts (replumb-proxy/eval-opts false src-paths)
                                                 :mode-line? true}]
                   (.getElementById js/document "app"))
   (reagent/render [buttons]
